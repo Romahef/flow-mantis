@@ -1,0 +1,49 @@
+{
+  "Queries": [
+    {
+      "Name": "Warehouses",
+      "Sql": "SELECT whs_ID, whs_Code, whs_Name, whs_Address, whs_Active FROM Warehouses WHERE whs_Active = 1",
+      "Paginable": false
+    },
+    {
+      "Name": "StockOwners",
+      "Sql": "SELECT own_ID, own_Code, own_Name, own_Active FROM StockOwners WHERE own_Active = 1",
+      "Paginable": false
+    },
+    {
+      "Name": "Customers",
+      "Sql": "SELECT cus_ID, cus_Code, cus_Name, cus_Email, cus_Phone, cus_Address, cus_Active, cus_CreatedDate FROM Customers WHERE cus_Active = 1",
+      "Paginable": true,
+      "PaginationMode": "Offset",
+      "OrderBy": "cus_ID"
+    },
+    {
+      "Name": "Items",
+      "Sql": "SELECT prd_ID, prd_Code, prd_Name, prd_Description, prd_UnitPrice, prd_Active FROM Products WHERE prd_Active = 1",
+      "Paginable": true,
+      "PaginationMode": "Offset",
+      "OrderBy": "prd_ID"
+    },
+    {
+      "Name": "StockItems",
+      "Sql": "SELECT p.prd_ID, p.prd_Code, p.prd_Barcode, p.prd_Weight, p.prd_Volume, COALESCE(SUM(s.stc_Quantity), 0) AS prd_StockLevel FROM Products p LEFT JOIN Stock s ON p.prd_ID = s.stc_ProductID WHERE p.prd_Active = 1 GROUP BY p.prd_ID, p.prd_Code, p.prd_Barcode, p.prd_Weight, p.prd_Volume",
+      "Paginable": true,
+      "PaginationMode": "Offset",
+      "OrderBy": "prd_ID"
+    },
+    {
+      "Name": "Inventory",
+      "Sql": "SELECT stc_ID, stc_SSCC, stc_ProductID, stc_WarehouseID, stc_Quantity, stc_Location, stc_EntryDate AS SSCCEntryDate, stc_ExpiryDate FROM Stock WHERE stc_Quantity > 0",
+      "Paginable": true,
+      "PaginationMode": "Token",
+      "KeyColumns": ["SSCCEntryDate", "stc_SSCC"]
+    },
+    {
+      "Name": "InventoryMovement",
+      "Sql": "SELECT rct_ID, rct_Code, rct_Type, rct_ProductID, rct_WarehouseID, rct_Quantity, rct_InputDate, rct_Reference FROM Receipts WHERE rct_InputDate >= DATEADD(day, -30, GETDATE())",
+      "Paginable": true,
+      "PaginationMode": "Token",
+      "KeyColumns": ["rct_InputDate", "rct_Code"]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "Routes": [
+    {
+      "Endpoint": "Warehouses",
+      "Queries": [
+        {
+          "QueryName": "Warehouses",
+          "TargetArray": "warehouses"
+        }
+      ]
+    },
+    {
+      "Endpoint": "StockOwners",
+      "Queries": [
+        {
+          "QueryName": "StockOwners",
+          "TargetArray": "stockOwners"
+        }
+      ]
+    },
+    {
+      "Endpoint": "Customers",
+      "Queries": [
+        {
+          "QueryName": "Customers",
+          "TargetArray": "customers"
+        }
+      ]
+    },
+    {
+      "Endpoint": "Items",
+      "Queries": [
+        {
+          "QueryName": "Items",
+          "TargetArray": "items"
+        },
+        {
+          "QueryName": "StockItems",
+          "TargetArray": "stockItems"
+        }
+      ]
+    },
+    {
+      "Endpoint": "Inventory",
+      "Queries": [
+        {
+          "QueryName": "Inventory",
+          "TargetArray": "stockDetail"
+        },
+        {
+          "QueryName": "InventoryMovement",
+          "TargetArray": "inventoryMovements"
+        }
+      ]
+    }
+  ]
+}

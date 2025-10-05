@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  
+  <Product Id="*"
+           Name="SqlSyncService"
+           Language="1033"
+           Version="1.0.0.0"
+           Manufacturer="SqlSyncService"
+           UpgradeCode="A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D">
+    
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Description="SQL Sync Service - Secure SQL Server API Gateway"
+             Comments="Provides secure HTTPS API access to SQL Server data" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="SqlSyncService" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ConfigComponents" />
+      <ComponentRef Id="ServiceComponent" />
+      <ComponentRef Id="FirewallComponent" />
+    </Feature>
+
+    <!-- Custom UI -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <!-- Custom dialog for configuration -->
+    <UI>
+      <DialogRef Id="SecurityDlg" />
+      <DialogRef Id="DatabaseDlg" />
+      
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="SecurityDlg">LicenseAccepted = "1"</Publish>
+      <Publish Dialog="SecurityDlg" Control="Next" Event="NewDialog" Value="DatabaseDlg">1</Publish>
+      <Publish Dialog="DatabaseDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+    </UI>
+
+    <!-- Properties for configuration -->
+    <Property Id="IPALLOWLIST" Value="" />
+    <Property Id="CERTIFICATEPATH" Value="" />
+    <Property Id="CERTIFICATEPASSWORD" Value="" Secure="yes" />
+    <Property Id="APIKEY" Value="" Secure="yes" />
+    <Property Id="DBSERVER" Value="localhost" />
+    <Property Id="DBPORT" Value="1433" />
+    <Property Id="DBNAME" Value="" />
+    <Property Id="DBUSERNAME" Value="" />
+    <Property Id="DBPASSWORD" Value="" Secure="yes" />
+    <Property Id="ADMINPASSPHRASE" Value="" Secure="yes" />
+
+    <!-- Custom actions -->
+    <CustomAction Id="GenerateConfig"
+                  BinaryKey="ConfigGenerator"
+                  DllEntry="GenerateConfiguration"
+                  Execute="deferred"
+                  Impersonate="no" />
+    
+    <CustomAction Id="InstallService"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="sc create SqlSyncService binPath= &quot;[INSTALLFOLDER]SqlSyncService.exe&quot; start= auto"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+
+    <CustomAction Id="StartService"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="sc start SqlSyncService"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <CustomAction Id="StopService"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="sc stop SqlSyncService"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <CustomAction Id="UninstallService"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="sc delete SqlSyncService"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <CustomAction Id="ConfigureFirewall"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="netsh advfirewall firewall add rule name=&quot;SqlSyncService 8443 Inbound&quot; dir=in action=allow protocol=TCP localport=8443"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <CustomAction Id="RemoveFirewallRule"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="netsh advfirewall firewall delete rule name=&quot;SqlSyncService 8443 Inbound&quot;"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!-- Install sequence -->
+    <InstallExecuteSequence>
+      <Custom Action="StopService" Before="InstallFiles">Installed</Custom>
+      <Custom Action="GenerateConfig" After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="ConfigureFirewall" After="GenerateConfig">NOT Installed</Custom>
+      <Custom Action="InstallService" After="ConfigureFirewall">NOT Installed</Custom>
+      <Custom Action="StartService" After="InstallService">NOT Installed</Custom>
+      <Custom Action="UninstallService" Before="RemoveFiles">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RemoveFirewallRule" After="UninstallService">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+
+  <!-- Directory structure -->
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="SqlSyncService" />
+      </Directory>
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="CONFIGFOLDER" Name="SqlSyncService">
+          <Directory Id="CERTFOLDER" Name="certs" />
+          <Directory Id="LOGFOLDER" Name="logs" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <!-- Components -->
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="MainExecutable" Guid="B2C3D4E5-F6A7-8B9C-0D1E-2F3A4B5C6D7E">
+        <File Id="SqlSyncService.exe"
+              Source="$(var.SqlSyncService.TargetPath)"
+              KeyPath="yes" />
+      </Component>
+      <Component Id="IntegrationSchema" Guid="C3D4E5F6-A7B8-9C0D-1E2F-3A4B5C6D7E8F">
+        <File Id="integration.json"
+              Source="$(var.SqlSyncService.ProjectDir)integration.json"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="ConfigComponents" Directory="CONFIGFOLDER">
+      <Component Id="ConfigPlaceholder" Guid="D4E5F6A7-B8C9-0D1E-2F3A-4B5C6D7E8F9A">
+        <CreateFolder />
+      </Component>
+    </ComponentGroup>
+
+    <Component Id="ServiceComponent" Directory="INSTALLFOLDER" Guid="E5F6A7B8-C9D0-1E2F-3A4B-5C6D7E8F9A0B">
+      <ServiceInstall Id="SqlSyncServiceInstall"
+                      Name="SqlSyncService"
+                      DisplayName="SQL Sync Service"
+                      Description="Provides secure HTTPS API access to SQL Server data"
+                      Type="ownProcess"
+                      Start="auto"
+                      ErrorControl="normal"
+                      Account="LocalSystem" />
+      <ServiceControl Id="SqlSyncServiceControl"
+                      Name="SqlSyncService"
+                      Start="install"
+                      Stop="both"
+                      Remove="uninstall" />
+    </Component>
+
+    <Component Id="FirewallComponent" Directory="INSTALLFOLDER" Guid="F6A7B8C9-D0E1-2F3A-4B5C-6D7E8F9A0B1C">
+      <util:FirewallException Id="SqlSyncFirewallRule"
+                              Name="SqlSyncService HTTPS"
+                              Port="8443"
+                              Protocol="tcp"
+                              Scope="any" />
+    </Component>
+  </Fragment>
+
+</Wix>

@@ -1,0 +1,62 @@
+<Window x:Class="SqlSyncService.Admin.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SqlSyncService - Admin Login"
+        Height="350" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundBrush}">
+    <Grid>
+        <Border Background="{StaticResource SurfaceBrush}" 
+                CornerRadius="8" 
+                Margin="50"
+                Padding="40">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="2" BlurRadius="8"/>
+            </Border.Effect>
+            
+            <StackPanel>
+                <!-- Logo/Title -->
+                <TextBlock Text="🔐 Admin Login" 
+                           FontSize="24" 
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+                
+                <TextBlock Text="SqlSyncService Administration" 
+                           FontSize="14"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,30"/>
+
+                <!-- Error Message -->
+                <Border x:Name="ErrorPanel" 
+                        Background="#fee2e2" 
+                        BorderBrush="#fca5a5"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12"
+                        Margin="0,0,0,16"
+                        Visibility="Collapsed">
+                    <TextBlock x:Name="ErrorText" 
+                               Text="Invalid passphrase"
+                               Foreground="#991b1b"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Passphrase Input -->
+                <Label Content="Admin Passphrase:"/>
+                <PasswordBox x:Name="PassphraseBox" 
+                            Margin="0,0,0,20"
+                            KeyDown="PassphraseBox_KeyDown"/>
+
+                <!-- Login Button -->
+                <Button Content="Login" 
+                        Style="{StaticResource PrimaryButton}"
+                        Click="LoginButton_Click"
+                        Height="40"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
