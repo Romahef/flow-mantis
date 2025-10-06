@@ -126,3 +126,4 @@ restart-*.bat
 fix-*.bat
 restore-*.sql
 restore-*.bat
+QUICK-FIX-*.bat
