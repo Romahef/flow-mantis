@@ -1,0 +1,212 @@
+﻿<Window x:Class="SqlSyncService.InstallerWizard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SqlSyncService Installer" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="#F5F5F5">
+    
+    <Window.Resources>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        
+        <Style x:Key="SubHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+        </Style>
+        
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980B9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#BDC3C7"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="30,20" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <StackPanel>
+                <TextBlock Text="SqlSyncService Installation Wizard" Style="{StaticResource HeaderStyle}"/>
+                <TextBlock x:Name="PageTitle" Text="Welcome" Style="{StaticResource SubHeaderStyle}"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <Grid Grid.Row="1" Margin="30">
+            <!-- Page 1: Welcome -->
+            <StackPanel x:Name="WelcomePage" Visibility="Visible">
+                <TextBlock Text="Welcome to SqlSyncService Installer" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,10" LineHeight="24">
+                    This wizard will guide you through the installation of SqlSyncService - a secure Windows Service 
+                    that provides HTTPS API access to Microsoft SQL Server data.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,10,0,20" LineHeight="24" Foreground="#E74C3C" FontWeight="SemiBold">
+                    ⚠ Important: This installer requires Administrator privileges and will:
+                </TextBlock>
+                <StackPanel Margin="20,0,0,0">
+                    <TextBlock Text="• Install SqlSyncService as a Windows Service" Margin="0,5"/>
+                    <TextBlock Text="• Create configuration files in C:\ProgramData\SqlSyncService" Margin="0,5"/>
+                    <TextBlock Text="• Configure Windows Firewall for port 8443" Margin="0,5"/>
+                    <TextBlock Text="• Install files to C:\Program Files\SqlSyncService" Margin="0,5"/>
+                </StackPanel>
+                <TextBlock TextWrapping="Wrap" Margin="0,20,0,10" LineHeight="24">
+                    Click <Bold>Next</Bold> to begin the configuration wizard.
+                </TextBlock>
+            </StackPanel>
+            
+            <!-- Page 2: Database Configuration -->
+            <ScrollViewer x:Name="DatabasePage" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Database Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+                    
+                    <TextBlock Text="SQL Server Address:" Margin="0,10,0,5"/>
+                    <TextBox x:Name="TxtDbServer" Text="localhost" Padding="8" FontSize="14"/>
+                    
+                    <TextBlock Text="Port:" Margin="0,10,0,5"/>
+                    <TextBox x:Name="TxtDbPort" Text="1433" Padding="8" FontSize="14"/>
+                    
+                    <TextBlock Text="Database Name:" Margin="0,10,0,5"/>
+                    <TextBox x:Name="TxtDbName" Padding="8" FontSize="14"/>
+                    
+                    <TextBlock Text="SQL Username:" Margin="0,10,0,5"/>
+                    <TextBox x:Name="TxtDbUser" Padding="8" FontSize="14"/>
+                    
+                    <TextBlock Text="SQL Password:" Margin="0,10,0,5"/>
+                    <PasswordBox x:Name="TxtDbPassword" Padding="8" FontSize="14"/>
+                    
+                    <CheckBox x:Name="ChkTrustCertificate" Content="Trust Server Certificate (for development)" 
+                              IsChecked="True" Margin="0,15,0,0"/>
+                    
+                    <Button Content="Test Connection" Style="{StaticResource ButtonStyle}" 
+                            Width="150" HorizontalAlignment="Left" Margin="0,20,0,0" 
+                            Click="TestConnection_Click"/>
+                    
+                    <TextBlock x:Name="TxtConnectionStatus" Margin="0,10,0,0" FontWeight="SemiBold"/>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- Page 3: Security Configuration -->
+            <ScrollViewer x:Name="SecurityPage" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Security Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+                    
+                    <TextBlock Text="API Key (leave blank to auto-generate):" Margin="0,10,0,5"/>
+                    <TextBox x:Name="TxtApiKey" Padding="8" FontSize="14"/>
+                    <TextBlock Text="A strong API key will be generated if left blank" 
+                               Foreground="#7F8C8D" FontSize="11" Margin="0,5,0,0"/>
+                    
+                    <TextBlock Text="IP Allow List (comma-separated, leave blank for localhost only):" Margin="0,15,0,5"/>
+                    <TextBox x:Name="TxtIpAllowList" Text="127.0.0.1, ::1" Padding="8" FontSize="14" Height="60" 
+                             TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                    
+                    <TextBlock Text="Admin Passphrase:" Margin="0,15,0,5"/>
+                    <PasswordBox x:Name="TxtAdminPassphrase" Padding="8" FontSize="14"/>
+                    <TextBlock Text="Used to access the Admin UI application" 
+                               Foreground="#7F8C8D" FontSize="11" Margin="0,5,0,0"/>
+                    
+                    <TextBlock Text="SSL Certificate (Optional):" Margin="0,15,0,5"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="TxtCertPath" Grid.Column="0" Padding="8" FontSize="14" IsReadOnly="True"/>
+                        <Button Grid.Column="1" Content="Browse..." Padding="10,8" Margin="10,0,0,0" 
+                                Click="BrowseCert_Click"/>
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Foreground="#E74C3C" FontSize="11" Margin="0,5,0,0">
+                        Note: For production, an SSL certificate is required. For testing, a self-signed certificate 
+                        will be generated automatically.
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- Page 4: Installing -->
+            <StackPanel x:Name="InstallingPage" Visibility="Collapsed" VerticalAlignment="Center">
+                <TextBlock Text="Installing SqlSyncService..." FontSize="18" FontWeight="Bold" 
+                           HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                <ProgressBar x:Name="InstallProgress" Height="30" IsIndeterminate="True" Margin="0,0,0,20"/>
+                <TextBlock x:Name="TxtInstallStatus" Text="Initializing..." HorizontalAlignment="Center" 
+                           Foreground="#7F8C8D" Margin="0,0,0,20"/>
+                <TextBox x:Name="TxtInstallLog" Height="250" IsReadOnly="True" VerticalScrollBarVisibility="Auto" 
+                         FontFamily="Consolas" FontSize="11" Background="#2C3E50" Foreground="#ECF0F1" 
+                         Padding="10" TextWrapping="Wrap"/>
+            </StackPanel>
+            
+            <!-- Page 5: Complete -->
+            <StackPanel x:Name="CompletePage" Visibility="Collapsed" VerticalAlignment="Center">
+                <TextBlock Text="✓" FontSize="72" Foreground="#27AE60" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <TextBlock Text="Installation Complete!" FontSize="24" FontWeight="Bold" 
+                           HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                
+                <Border Background="White" Padding="20" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Important Information:" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="TxtApiKeyDisplay" TextWrapping="Wrap" Margin="0,5" FontFamily="Consolas"/>
+                        <TextBlock Text=" " Margin="0,10"/>
+                        <TextBlock Text="Service installed at:" FontWeight="SemiBold"/>
+                        <TextBlock Text="C:\Program Files\SqlSyncService\" Margin="0,2"/>
+                        <TextBlock Text=" " Margin="0,5"/>
+                        <TextBlock Text="Configuration files:" FontWeight="SemiBold"/>
+                        <TextBlock Text="C:\ProgramData\SqlSyncService\" Margin="0,2"/>
+                        <TextBlock Text=" " Margin="0,5"/>
+                        <TextBlock Text="Service Status:" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="TxtServiceStatus" Margin="0,2"/>
+                    </StackPanel>
+                </Border>
+                
+                <CheckBox x:Name="ChkStartService" Content="Start SqlSyncService now" IsChecked="True" 
+                          Margin="0,20,0,0" FontSize="14"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Footer with Navigation Buttons -->
+        <Border Grid.Row="2" Background="White" Padding="30,15" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button x:Name="BtnCancel" Content="Cancel" Width="100" Padding="10" 
+                            Click="Cancel_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="BtnBack" Content="← Back" Width="100" Padding="10" 
+                            Margin="0,0,10,0" Click="Back_Click" IsEnabled="False"/>
+                    <Button x:Name="BtnNext" Content="Next →" Width="100" Style="{StaticResource ButtonStyle}" 
+                            Click="Next_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

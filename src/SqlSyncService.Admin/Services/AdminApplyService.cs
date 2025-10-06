@@ -1,3 +1,5 @@
+using System.IO;
+using Microsoft.Extensions.Logging;
 using SqlSyncService.Config;
 using SqlSyncService.Database;
 using System.Security.Cryptography.X509Certificates;

@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SqlSyncService-Installer</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    
+    <!-- Single File Publishing -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Embed the entire service as a zip file -->
+    <EmbeddedResource Include="..\..\publish-installer\service-embedded.zip" Link="Resources\service.zip" LogicalName="service.zip" Condition="Exists('..\..\publish-installer\service-embedded.zip')" />
+    
+    <!-- Embed the Admin UI as a zip file -->
+    <EmbeddedResource Include="..\..\publish-installer\admin-embedded.zip" Link="Resources\admin.zip" LogicalName="admin.zip" Condition="Exists('..\..\publish-installer\admin-embedded.zip')" />
+    
+    <!-- Embed config samples -->
+    <EmbeddedResource Include="..\..\config-samples\appsettings.json" Link="Resources\appsettings.json" LogicalName="appsettings.json" />
+    <EmbeddedResource Include="..\..\config-samples\queries.json" Link="Resources\queries.json" LogicalName="queries.json" />
+    <EmbeddedResource Include="..\..\config-samples\mapping.json" Link="Resources\mapping.json" LogicalName="mapping.json" />
+    <EmbeddedResource Include="..\..\src\SqlSyncService\integration.json" Link="Resources\integration.json" LogicalName="integration.json" />
+  </ItemGroup>
+
+</Project>

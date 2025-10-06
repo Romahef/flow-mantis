@@ -96,3 +96,21 @@ coverage/
 # Backup files
 *.bak
 *.backup
+
+# Publish outputs (temporary build artifacts)
+publish-*/
+final-installer*/
+
+# Test files
+setup-test-*.sql
+*-test-*.txt
+database-setup-log.txt
+
+# Temporary scripts
+install-admin-ui.ps1
+start-service.ps1
+Launch-AdminUI.bat
+
+# Installer executables (keep in releases, not in source)
+SqlSyncService-Complete-Installer.exe
+SqlSyncService-*-Installer.exe
