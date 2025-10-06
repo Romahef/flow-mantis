@@ -25,22 +25,33 @@ public class AdminAuthService
         try
         {
             var settings = _configStore.LoadAppSettings();
-            var expectedPassphrase = ConfigStore.Secrets.GetAdminPassphrase(settings);
+            var expectedPassphraseHash = ConfigStore.Secrets.GetAdminPassphrase(settings);
 
-            if (string.IsNullOrEmpty(expectedPassphrase))
+            if (string.IsNullOrEmpty(expectedPassphraseHash))
             {
                 _logger.LogWarning("Admin passphrase not set in configuration");
                 return false;
             }
 
-            // Constant-time comparison
-            return CryptographicEquals(passphrase, expectedPassphrase);
+            // Hash the input passphrase
+            var inputHash = HashPassphrase(passphrase);
+
+            // Constant-time comparison of hashes
+            return CryptographicEquals(inputHash, expectedPassphraseHash);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating admin passphrase");
             return false;
         }
+    }
+
+    private static string HashPassphrase(string passphrase)
+    {
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var bytes = System.Text.Encoding.UTF8.GetBytes(passphrase);
+        var hash = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hash);
     }
 
     private static bool CryptographicEquals(string a, string b)
