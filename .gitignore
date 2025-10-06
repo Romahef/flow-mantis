@@ -114,3 +114,10 @@ Launch-AdminUI.bat
 # Installer executables (keep in releases, not in source)
 SqlSyncService-Complete-Installer.exe
 SqlSyncService-*-Installer.exe
+*.zip
+
+# Old installer projects
+src/SqlSyncService.Installer.Bootstrap/
+
+# Temporary uninstall scripts
+uninstall-old-version.ps1
