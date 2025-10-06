@@ -119,5 +119,10 @@ SqlSyncService-*-Installer.exe
 # Old installer projects
 src/SqlSyncService.Installer.Bootstrap/
 
-# Temporary uninstall scripts
+# Temporary scripts and fixes
 uninstall-old-version.ps1
+restart-*.ps1
+restart-*.bat
+fix-*.bat
+restore-*.sql
+restore-*.bat
