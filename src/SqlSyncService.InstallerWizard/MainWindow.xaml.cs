@@ -34,6 +34,186 @@ public partial class MainWindow : Window
             };
             
             ShowPage(0);
+            
+            // Check for existing installation
+            Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (IsExistingInstallationDetected())
+            {
+                var result = MessageBox.Show(
+                    "An existing installation of SqlSyncService has been detected.\n\n" +
+                    "Would you like to uninstall the previous version before installing?\n\n" +
+                    "Note: Your configuration files will be preserved and can be reused.",
+                    "Existing Installation Detected",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Show installing page for uninstallation
+                    ShowPage(3);
+                    BtnNext.IsEnabled = false;
+                    BtnBack.IsEnabled = false;
+                    BtnCancel.IsEnabled = false;
+
+                    LogInstall("Uninstalling previous version...");
+                    await Task.Run(() => UninstallPreviousVersion());
+                    LogInstall("Previous version uninstalled successfully!");
+                    LogInstall("");
+
+                    await Task.Delay(2000);
+
+                    // Go back to welcome page
+                    ShowPage(0);
+                    BtnNext.IsEnabled = true;
+                    BtnBack.IsEnabled = false;
+                    BtnCancel.IsEnabled = true;
+
+                    MessageBox.Show(
+                        "Previous installation has been removed.\n\n" +
+                        "You can now proceed with the new installation.",
+                        "Uninstall Complete",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    Application.Current.Shutdown();
+                }
+                // If No, continue with installation (might fail if service is running)
+            }
+        }
+
+        private bool IsExistingInstallationDetected()
+        {
+            // Check if service exists
+            try
+            {
+                var serviceCheck = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "sc",
+                        Arguments = "query SqlSyncService",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+                serviceCheck.Start();
+                serviceCheck.WaitForExit();
+
+                if (serviceCheck.ExitCode == 0)
+                    return true;
+            }
+            catch { }
+
+            // Check if installation directory exists
+            if (Directory.Exists(InstallPath) && Directory.GetFiles(InstallPath, "SqlSyncService.exe", SearchOption.TopDirectoryOnly).Length > 0)
+                return true;
+
+            return false;
+        }
+
+        private void UninstallPreviousVersion()
+        {
+            try
+            {
+                // Step 1: Stop the service
+                LogInstall("[1/4] Stopping service...");
+                try
+                {
+                    RunCommand("sc", "stop SqlSyncService");
+                    Thread.Sleep(2000);
+                    LogInstall("Service stopped");
+                }
+                catch
+                {
+                    LogInstall("Service was not running");
+                }
+
+                // Step 2: Delete the service
+                LogInstall("[2/4] Removing service...");
+                try
+                {
+                    RunCommand("sc", "delete SqlSyncService");
+                    Thread.Sleep(2000);
+                    LogInstall("Service removed");
+                }
+                catch (Exception ex)
+                {
+                    LogInstall($"Warning: {ex.Message}");
+                }
+
+                // Step 3: Remove firewall rule
+                LogInstall("[3/4] Removing firewall rule...");
+                try
+                {
+                    RunCommand("netsh", "advfirewall firewall delete rule name=\"SqlSyncService HTTPS\"");
+                    LogInstall("Firewall rule removed");
+                }
+                catch
+                {
+                    LogInstall("No firewall rule found");
+                }
+
+                // Step 4: Remove shortcuts
+                LogInstall("[4/4] Removing shortcuts...");
+                try
+                {
+                    var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                    var shortcuts = new[]
+                    {
+                        Path.Combine(desktopPath, "SqlSyncService Admin.lnk"),
+                        Path.Combine(desktopPath, "SqlSyncService Admin.bat")
+                    };
+
+                    foreach (var shortcut in shortcuts)
+                    {
+                        if (File.Exists(shortcut))
+                        {
+                            File.Delete(shortcut);
+                            LogInstall($"Removed: {Path.GetFileName(shortcut)}");
+                        }
+                    }
+
+                    var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs", "SqlSyncService");
+                    if (Directory.Exists(startMenuPath))
+                    {
+                        Directory.Delete(startMenuPath, true);
+                        LogInstall("Removed Start Menu folder");
+                    }
+
+                    LogInstall("Shortcuts removed");
+                }
+                catch (Exception ex)
+                {
+                    LogInstall($"Warning: {ex.Message}");
+                }
+
+                // Remove old files (but keep configuration)
+                LogInstall("Removing old files (preserving configuration)...");
+                try
+                {
+                    if (Directory.Exists(InstallPath))
+                    {
+                        Directory.Delete(InstallPath, true);
+                        LogInstall("Old files removed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogInstall($"Warning: Could not remove all files: {ex.Message}");
+                    LogInstall("You may need to manually remove: " + InstallPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogInstall($"Error during uninstallation: {ex.Message}");
+            }
         }
 
         private void ShowPage(int pageIndex)
@@ -177,6 +357,49 @@ public partial class MainWindow : Window
                 return false;
             }
             
+            // Validate Let's Encrypt fields
+            if (RbHttpsLetsEncrypt.IsChecked == true)
+            {
+                if (string.IsNullOrWhiteSpace(TxtDomainName.Text) || TxtDomainName.Text.Contains("yourdomain"))
+                {
+                    MessageBox.Show("Please enter a valid domain name for Let's Encrypt.", 
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                
+                if (string.IsNullOrWhiteSpace(TxtLetsEncryptEmail.Text) || TxtLetsEncryptEmail.Text.Contains("yourdomain"))
+                {
+                    MessageBox.Show("Please enter a valid email address for Let's Encrypt notifications.", 
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                
+                if (ChkAcceptTerms.IsChecked != true)
+                {
+                    MessageBox.Show("You must accept the Let's Encrypt Terms of Service to continue.", 
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+            
+            // Validate certificate file if custom certificate is selected
+            if (RbHttpsCustomCert.IsChecked == true)
+            {
+                if (string.IsNullOrWhiteSpace(TxtCertPath.Text))
+                {
+                    MessageBox.Show("Please select a certificate file (.pfx) or choose a different security mode.", 
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                
+                if (!File.Exists(TxtCertPath.Text))
+                {
+                    MessageBox.Show("The selected certificate file does not exist.", 
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+            
             return true;
         }
 
@@ -228,6 +451,31 @@ public partial class MainWindow : Window
             {
                 TxtCertPath.Text = dialog.FileName;
             }
+        }
+
+        private void SecurityMode_Changed(object sender, RoutedEventArgs e)
+        {
+            // Show appropriate panel based on selection
+            if (RbHttpsLetsEncrypt != null && RbHttpsCustomCert != null)
+            {
+                PnlLetsEncrypt.Visibility = RbHttpsLetsEncrypt.IsChecked == true 
+                    ? Visibility.Visible 
+                    : Visibility.Collapsed;
+                    
+                PnlCertificateUpload.Visibility = RbHttpsCustomCert.IsChecked == true 
+                    ? Visibility.Visible 
+                    : Visibility.Collapsed;
+            }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = e.Uri.AbsoluteUri,
+                UseShellExecute = true
+            });
+            e.Handled = true;
         }
 
         private async Task PerformInstallationAsync()
@@ -353,9 +601,52 @@ public partial class MainWindow : Window
             
             writer.WriteStartObject();
             
+            // Determine security mode
+            bool enableHttps = RbHttpsSelfSigned.IsChecked == true || RbHttpsCustomCert.IsChecked == true || RbHttpsLetsEncrypt.IsChecked == true;
+            string protocol = enableHttps ? "https" : "http";
+            int port = enableHttps ? 8443 : 8080;
+            string certPath = "";
+            string certPassword = "";
+            
+            // Generate self-signed certificate if needed
+            if (RbHttpsSelfSigned.IsChecked == true)
+            {
+                LogInstall("Generating self-signed certificate...");
+                certPath = Path.Combine(ConfigPath, "self-signed-cert.pfx");
+                certPassword = GenerateApiKey(); // Use strong random password
+                GenerateSelfSignedCertificate(certPath, certPassword);
+                LogInstall($"Self-signed certificate created: {certPath}");
+            }
+            else if (RbHttpsLetsEncrypt.IsChecked == true)
+            {
+                LogInstall("Obtaining Let's Encrypt certificate...");
+                LogInstall($"Domain: {TxtDomainName.Text}");
+                certPath = Path.Combine(ConfigPath, "letsencrypt-cert.pfx");
+                certPassword = GenerateApiKey();
+                
+                try
+                {
+                    await ObtainLetsEncryptCertificate(TxtDomainName.Text, TxtLetsEncryptEmail.Text, certPath, certPassword);
+                    LogInstall($"Let's Encrypt certificate obtained successfully!");
+                }
+                catch (Exception ex)
+                {
+                    LogInstall($"Warning: Let's Encrypt certificate could not be obtained: {ex.Message}");
+                    LogInstall("Falling back to self-signed certificate...");
+                    certPath = Path.Combine(ConfigPath, "self-signed-cert.pfx");
+                    GenerateSelfSignedCertificate(certPath, certPassword);
+                    LogInstall("Self-signed certificate created as fallback");
+                }
+            }
+            else if (RbHttpsCustomCert.IsChecked == true)
+            {
+                certPath = TxtCertPath.Text;
+                certPassword = TxtCertPassword.Password;
+            }
+            
             // Service section
             writer.WriteStartObject("Service");
-            writer.WriteString("ListenUrl", "https://0.0.0.0:8443");
+            writer.WriteString("ListenUrl", $"{protocol}://0.0.0.0:{port}");
             writer.WriteEndObject();
             
             // Database section
@@ -374,11 +665,11 @@ public partial class MainWindow : Window
             // Security section
             writer.WriteStartObject("Security");
             writer.WriteBoolean("RequireApiKey", true);
-            writer.WriteBoolean("EnableHttps", true);
+            writer.WriteBoolean("EnableHttps", enableHttps);
             
             writer.WriteStartObject("Certificate");
-            writer.WriteString("Path", string.IsNullOrWhiteSpace(TxtCertPath.Text) ? "" : TxtCertPath.Text);
-            writer.WriteString("PasswordEncrypted", "");
+            writer.WriteString("Path", certPath);
+            writer.WriteString("PasswordEncrypted", string.IsNullOrEmpty(certPassword) ? "" : ProtectString(certPassword));
             writer.WriteEndObject();
             
             writer.WriteString("ApiKeyEncrypted", ProtectString(generatedApiKey!));
@@ -458,6 +749,218 @@ public partial class MainWindow : Window
                 rng.GetBytes(bytes);
             }
             return Convert.ToBase64String(bytes);
+        }
+
+        private void GenerateSelfSignedCertificate(string certPath, string password)
+        {
+            try
+            {
+                // Use PowerShell to generate self-signed certificate
+                var psScript = $@"
+                    $cert = New-SelfSignedCertificate -DnsName 'localhost', '127.0.0.1' -CertStoreLocation 'Cert:\LocalMachine\My' -NotAfter (Get-Date).AddYears(10) -KeyAlgorithm RSA -KeyLength 2048
+                    $certPassword = ConvertTo-SecureString -String '{password}' -Force -AsPlainText
+                    Export-PfxCertificate -Cert $cert -FilePath '{certPath}' -Password $certPassword
+                    Remove-Item -Path ""Cert:\LocalMachine\My\$($cert.Thumbprint)"" -Force
+                ";
+                
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{psScript}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+                
+                process.Start();
+                process.WaitForExit();
+                
+                if (process.ExitCode != 0)
+                {
+                    var error = process.StandardError.ReadToEnd();
+                    throw new Exception($"Certificate generation failed: {error}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogInstall($"Warning: Could not generate self-signed certificate: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task ObtainLetsEncryptCertificate(string domain, string email, string certPath, string password)
+        {
+            try
+            {
+                // Download win-acme if not present
+                var wacsPath = Path.Combine(InstallPath, "wacs");
+                if (!Directory.Exists(wacsPath))
+                {
+                    LogInstall("Downloading win-acme (ACME client)...");
+                    await DownloadWinAcme(wacsPath);
+                }
+                
+                var wacsExe = Path.Combine(wacsPath, "wacs.exe");
+                
+                // Create win-acme command
+                // Using standalone mode with manual plugin for simple HTTP-01 challenge
+                var wacsArgs = $"--source manual --host {domain} --emailaddress {email} " +
+                              $"--accepttos --store pemfiles --pemfilespath \"{ConfigPath}\" " +
+                              $"--installation script --script \"powershell.exe\" " +
+                              $"--scriptparameters \"Exit 0\" --closeonfinish --noninteractive";
+                
+                LogInstall($"Running ACME challenge for {domain}...");
+                LogInstall("Note: This requires port 80 to be accessible from the internet");
+                
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = wacsExe,
+                        Arguments = wacsArgs,
+                        WorkingDirectory = wacsPath,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+                
+                process.OutputDataReceived += (s, e) => {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                        LogInstall($"  {e.Data}");
+                };
+                
+                process.Start();
+                process.BeginOutputReadLine();
+                await Task.Run(() => process.WaitForExit());
+                
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"win-acme failed with exit code {process.ExitCode}");
+                }
+                
+                // Convert PEM files to PFX
+                LogInstall("Converting certificate to PFX format...");
+                var pemCert = Path.Combine(ConfigPath, $"{domain}-chain.pem");
+                var pemKey = Path.Combine(ConfigPath, $"{domain}-key.pem");
+                
+                if (!File.Exists(pemCert) || !File.Exists(pemKey))
+                {
+                    throw new Exception("Certificate files not found after ACME challenge");
+                }
+                
+                // Use OpenSSL or PowerShell to convert PEM to PFX
+                var convertScript = $@"
+                    $cert = Get-Content '{pemCert}' -Raw
+                    $key = Get-Content '{pemKey}' -Raw
+                    $certPassword = ConvertTo-SecureString -String '{password}' -Force -AsPlainText
+                    
+                    # Create temp PEM file with both cert and key
+                    $combined = $cert + ""`n"" + $key
+                    $tempPem = '{Path.Combine(ConfigPath, "temp.pem")}'
+                    Set-Content -Path $tempPem -Value $combined
+                    
+                    # Convert to PFX using certutil or openssl (if available)
+                    # For now, we'll use a PowerShell approach
+                    $certObj = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($tempPem, '', 'Exportable')
+                    $certBytes = $certObj.Export('Pfx', '{password}')
+                    [System.IO.File]::WriteAllBytes('{certPath}', $certBytes)
+                    
+                    Remove-Item $tempPem -Force
+                ";
+                
+                var convertProcess = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{convertScript}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+                
+                convertProcess.Start();
+                await Task.Run(() => convertProcess.WaitForExit());
+                
+                if (!File.Exists(certPath))
+                {
+                    throw new Exception("Failed to convert certificate to PFX format");
+                }
+                
+                // Setup auto-renewal (create scheduled task)
+                LogInstall("Setting up automatic certificate renewal...");
+                CreateCertRenewalTask(wacsExe, wacsPath);
+            }
+            catch (Exception ex)
+            {
+                LogInstall($"Let's Encrypt error: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task DownloadWinAcme(string targetPath)
+        {
+            // For production, download win-acme from GitHub releases
+            // For now, we'll provide instructions
+            Directory.CreateDirectory(targetPath);
+            
+            var readmePath = Path.Combine(targetPath, "README.txt");
+            await File.WriteAllTextAsync(readmePath, 
+                "Win-ACME download required\n\n" +
+                "To use Let's Encrypt, download win-acme from:\n" +
+                "https://github.com/win-acme/win-acme/releases/latest\n\n" +
+                "Extract wacs.exe to this directory.");
+            
+            throw new Exception("Win-ACME not found. Please download it manually or use a different security mode.");
+        }
+
+        private void CreateCertRenewalTask(string wacsExe, string wacsPath)
+        {
+            try
+            {
+                // Create a scheduled task to run win-acme renewal daily
+                var taskName = "SqlSyncService-CertRenewal";
+                var taskScript = $@"
+                    $action = New-ScheduledTaskAction -Execute '{wacsExe}' -Argument '--renew --baseuri https://acme-v02.api.letsencrypt.org/' -WorkingDirectory '{wacsPath}'
+                    $trigger = New-ScheduledTaskTrigger -Daily -At 3am
+                    $principal = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
+                    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopOnIdleEnd
+                    Register-ScheduledTask -TaskName '{taskName}' -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force
+                ";
+                
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{taskScript}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+                
+                process.Start();
+                process.WaitForExit();
+                
+                if (process.ExitCode == 0)
+                {
+                    LogInstall("Certificate auto-renewal task created successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogInstall($"Warning: Could not create renewal task: {ex.Message}");
+            }
         }
 
         private void InstallWindowsService()

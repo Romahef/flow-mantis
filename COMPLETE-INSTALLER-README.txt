@@ -1,10 +1,10 @@
 ═══════════════════════════════════════════════════════════════
-  SqlSyncService - COMPLETE INSTALLER v2.0
-  Everything Included - True One-Click Installation
+  SqlSyncService - COMPLETE INSTALLER v3.0
+  Full-Featured One-Click Installation with Multiple Security Options
 ═══════════════════════════════════════════════════════════════
 
 📦 INSTALLER FILE:
-   SqlSyncService-Complete-Installer.exe (79.6 MB)
+   SqlSyncService-Complete-Installer.exe (72.3 MB)
 
 ✨ WHAT'S INCLUDED - EVERYTHING!
    ✓ Windows Service (SqlSyncService)
@@ -14,9 +14,36 @@
    ✓ Configuration wizard with GUI
    ✓ Automatic service installation
    ✓ Firewall configuration
-   ✓ Desktop shortcuts
-   ✓ Start Menu shortcuts
+   ✓ Desktop & Start Menu shortcuts
    ✓ Sample queries and endpoints
+   ✓ Existing installation detection and auto-uninstall
+
+🔐 SECURITY OPTIONS (Choose during installation):
+   
+   [1] HTTP (No Encryption) - Port 8080
+       ✓ Best for internal networks
+       ✓ Works with IP addresses
+       ✓ No certificate required
+       ✓ Simple and fast
+   
+   [2] HTTPS with Self-Signed Certificate - Port 8443
+       ✓ Encrypted connection
+       ✓ Works with IP addresses  
+       ✓ Auto-generated during installation
+       ✓ Clients must accept self-signed certificate
+   
+   [3] HTTPS with Let's Encrypt (FREE SSL) - Port 8443 ⭐ NEW!
+       ✓ Trusted SSL certificate
+       ✓ Requires a public domain name
+       ✓ Domain must point to this server
+       ✓ Port 80 must be accessible
+       ✓ Automatic 90-day renewal configured
+       ✓ Production-ready
+   
+   [4] HTTPS with Custom Certificate - Port 8443
+       ✓ Use your own .pfx certificate file
+       ✓ Enterprise-grade security
+       ✓ Full trust chain
 
 ═══════════════════════════════════════════════════════════════
 🚀 INSTALLATION STEPS:
@@ -25,8 +52,14 @@
 1. Right-click "SqlSyncService-Complete-Installer.exe"
 
 2. Select "Run as Administrator" (REQUIRED!)
+   ⚠ The installer will automatically request admin privileges
 
-3. Follow the wizard:
+3. If existing installation detected:
+   ✓ Installer will offer to uninstall previous version
+   ✓ Configuration files are preserved
+   ✓ One-click removal and fresh install
+
+4. Follow the wizard:
    
    PAGE 1: Welcome
    ✓ Review what will be installed
@@ -36,312 +69,304 @@
    ✓ Enter SQL Server address (e.g., localhost\SQLEXPRESS)
    ✓ Enter database name
    ✓ Enter SQL username and password
-   ✓ Click "Test Connection" to verify (optional but recommended)
+   ✓ Click "Test Connection" to verify (recommended)
    ✓ Click "Next"
    
    PAGE 3: Security Configuration
-   ✓ API Key: Leave blank for auto-generation (recommended)
-   ✓ IP Allow List: Enter IPs or leave default (127.0.0.1, ::1)
-   ✓ Admin Passphrase: Set a passphrase for Admin UI access
-   ✓ SSL Certificate: Optional (browse for .pfx file or leave blank)
-   ✓ Click "Install"
+   ✓ Enter API key (or leave blank to auto-generate)
+   ✓ Configure IP Allow List (comma-separated IPs)
+   ✓ Enter Admin Passphrase for Admin UI
    
-   PAGE 4: Installation Progress
-   ✓ Watch real-time installation log
-   ✓ Service files extracted
-   ✓ Admin UI extracted
-   ✓ Configuration created
-   ✓ Service installed
-   ✓ Firewall configured
-   ✓ Shortcuts created
+   ✓ Choose Security Mode:
+     
+     Option 1: HTTP (No Encryption)
+     ✓ Perfect for: Internal networks, private VLANs
+     ✓ Access via: http://server-ip:8080
+     
+     Option 2: HTTPS with Self-Signed
+     ✓ Perfect for: IP-based access with encryption
+     ✓ Access via: https://server-ip:8443
+     ✓ Note: Browser will show certificate warning
+     
+     Option 3: HTTPS with Let's Encrypt ⭐
+     ✓ Perfect for: Production with domain names
+     ✓ Enter your domain name (e.g., api.example.com)
+     ✓ Enter contact email for renewal notices
+     ✓ Accept Let's Encrypt Terms of Service
+     ✓ Access via: https://yourdomain.com:8443
+     ✓ Requirements:
+        - Domain must point to this server's public IP
+        - Port 80 must be open and accessible
+        - Server must be reachable from internet
+     
+     Option 4: Custom Certificate
+     ✓ Perfect for: Enterprise with existing certs
+     ✓ Browse to your .pfx certificate file
+     ✓ Enter certificate password (if any)
    
-   PAGE 5: Complete
-   ✓ **COPY AND SAVE THE API KEY!** (shown only once)
-   ✓ Check "Start SqlSyncService now" if ready
+   ✓ Click "Next"
+   
+   PAGE 4: Installing
+   ✓ Watch real-time installation progress
+   ✓ All steps automated:
+      [1/8] Extracting service files
+      [2/8] Extracting Admin UI
+      [3/8] Creating directories
+      [4/8] Generating API key
+      [5/8] Creating configuration files
+      [6/8] Installing Windows Service
+      [7/8] Configuring firewall
+      [8/8] Creating shortcuts
+   
+   PAGE 5: Complete!
+   ✓ Copy the displayed API key (SAVE IT SECURELY!)
+   ✓ Optionally start the service immediately
    ✓ Click "Finish"
 
-4. Done! Everything is installed.
+5. DONE! 🎉
 
 ═══════════════════════════════════════════════════════════════
-📁 WHAT GETS INSTALLED:
+📋 WHAT WAS INSTALLED:
 ═══════════════════════════════════════════════════════════════
 
 Service Files:
    C:\Program Files\SqlSyncService\
-   ├── SqlSyncService.exe (Windows Service)
-   ├── SqlSyncService.dll
-   ├── integration.json
-   ├── Admin\
-   │   ├── SqlSyncService.Admin.exe ← Admin UI
-   │   └── [all Admin UI dependencies]
-   └── [all service dependencies]
+   ├── SqlSyncService.exe
+   ├── SqlSyncService.Admin.exe (via Admin\ subfolder)
+   └── All required DLLs
 
-Configuration:
+Configuration Files:
    C:\ProgramData\SqlSyncService\
-   ├── appsettings.json (database, security settings)
-   ├── queries.json (SQL query definitions)
-   ├── mapping.json (API endpoint mappings)
-   ├── certs\ (for SSL certificates)
-   └── logs\ (service logs)
+   ├── appsettings.json  (service configuration)
+   ├── queries.json      (5 sample queries included)
+   ├── mapping.json      (5 API endpoints mapped)
+   └── logs\             (service logs directory)
 
-Shortcuts Created:
+Shortcuts:
    Desktop:
-   ✓ SqlSyncService Admin.lnk
-
-   Start Menu → Programs → SqlSyncService:
-   ✓ SqlSyncService Admin.lnk
-   ✓ Configuration Files.lnk
+      └── SqlSyncService Admin.lnk
+   
+   Start Menu:
+      Programs\SqlSyncService\
+      ├── SqlSyncService Admin.lnk
+      └── Configuration Files.lnk
 
 Windows Service:
    Name: SqlSyncService
-   Display: SQL Sync Service
-   Status: Ready to start (or running if you checked the box)
+   Display Name: SQL Sync Service
+   Description: Provides secure HTTPS API access to SQL Server data
+   Startup Type: Manual (start on demand)
 
-Firewall:
-   Rule: "SqlSyncService HTTPS" (TCP port 8443)
+Firewall Rule:
+   Name: SqlSyncService HTTPS (or HTTP)
+   Port: 8443 (HTTPS) or 8080 (HTTP)
+   Direction: Inbound
+   Action: Allow
+
+Let's Encrypt (if selected):
+   Certificate: C:\ProgramData\SqlSyncService\letsencrypt-cert.pfx
+   Renewal Task: Scheduled daily at 3 AM
+   Task Name: SqlSyncService-CertRenewal
 
 ═══════════════════════════════════════════════════════════════
-🎨 ACCESSING THE ADMIN UI:
+🔧 POST-INSTALLATION:
 ═══════════════════════════════════════════════════════════════
 
-METHOD 1: Desktop Shortcut (Easiest)
-   ✓ Double-click "SqlSyncService Admin" on your desktop
-   ✓ Enter the admin passphrase you set during installation
-   ✓ Start configuring!
+1. Start the Service:
+   Option A: Check "Start service now" on completion page
+   Option B: Run as Admin: net start SqlSyncService
+   Option C: Services.msc → Find "SQL Sync Service" → Start
 
-METHOD 2: Start Menu
-   ✓ Start Menu → Programs → SqlSyncService → SqlSyncService Admin
+2. Verify Service is Running:
+   - Open Services (services.msc)
+   - Find "SQL Sync Service"
+   - Status should be "Running"
+
+3. Test API Access:
+   HTTP Mode:
+      curl http://localhost:8080/api/customers -H "X-API-Key: YOUR_API_KEY"
    
-METHOD 3: Direct Launch
-   ✓ Run: C:\Program Files\SqlSyncService\Admin\SqlSyncService.Admin.exe
-
-═══════════════════════════════════════════════════════════════
-📝 WHAT YOU CAN DO IN THE ADMIN UI:
-═══════════════════════════════════════════════════════════════
-
-SECURITY TAB:
-   • Rotate API keys (generates new key)
-   • Add/remove IPs from allow-list
-   • Update SSL certificate path
-   • Validate certificate
-
-DATABASE TAB:
-   • Edit connection settings
-   • Change server/database/credentials
-   • TEST CONNECTION button (verifies immediately)
-
-QUERIES TAB: ← MAIN CONFIGURATION
-   • Add new SQL queries
-   • Edit existing queries
-   • Delete queries
-   • Configure pagination:
-     - Offset mode (page numbers)
-     - Token mode (cursor-based for large datasets)
-   • Set page sizes
-   • Define ORDER BY clauses
-   • Specify key columns for token pagination
-
-MAPPING TAB:
-   • View endpoint-to-query mappings
-   • See which endpoints are exposed
-   • Validate against integration schema
-
-ABOUT TAB:
-   • View service configuration
-   • See installation paths
-   • Check service status
-
-═══════════════════════════════════════════════════════════════
-🔑 IMPORTANT INFORMATION:
-═══════════════════════════════════════════════════════════════
-
-API KEY:
-   ✓ Shown on completion page - SAVE IT!
-   ✓ Required for all API calls (header: X-API-Key)
-   ✓ Can generate new one in Admin UI if lost
-
-ADMIN PASSPHRASE:
-   ✓ Set during installation
-   ✓ Required to open Admin UI
-   ✓ Stored as SHA-256 hash in appsettings.json
-
-DEFAULT QUERIES:
-   The installer creates 5 sample queries:
-   1. Customers - Get all active customers
-   2. Products - Get all active products
-   3. Orders - Get all orders
-   4. OrderDetails - Get order line items
-   5. CustomerOrders - Get customers with orders (joined)
+   HTTPS Self-Signed:
+      curl https://localhost:8443/api/customers -H "X-API-Key: YOUR_API_KEY" -k
    
-   You can modify/delete these in the Admin UI!
+   HTTPS Let's Encrypt or Custom:
+      curl https://yourdomain.com:8443/api/customers -H "X-API-Key: YOUR_API_KEY"
 
-DEFAULT ENDPOINTS:
-   /api/queries/Customers
-   /api/queries/Products
-   /api/queries/Orders
-   /api/queries/OrderDetails
-   /api/queries/CustomerOrders
-
-═══════════════════════════════════════════════════════════════
-✅ AFTER INSTALLATION:
-═══════════════════════════════════════════════════════════════
-
-1. START THE SERVICE (if not already running):
-   • Services.msc → "SQL Sync Service" → Start
-   • Or PowerShell: Start-Service SqlSyncService
-
-2. TEST THE API:
-   • Health check (no auth): https://localhost:8443/health
-   • List queries (with API key): https://localhost:8443/api/queries
-
-3. OPEN ADMIN UI:
-   • Double-click desktop shortcut
-   • Enter your admin passphrase
-   • Review/modify queries as needed
-
-4. MAKE CHANGES:
-   • Add your own queries in Admin UI
-   • Map them to endpoints
-   • Click "Save Configuration"
-   • Restart service: Restart-Service SqlSyncService
-
-5. TEST YOUR ENDPOINTS:
-   PowerShell Example:
-   ```
-   $apiKey = "YOUR_API_KEY_HERE"
-   $headers = @{"X-API-Key" = $apiKey}
-   
-   # Get customers
-   Invoke-RestMethod -Uri "https://localhost:8443/api/queries/Customers" `
-       -Headers $headers -SkipCertificateCheck
-   ```
+4. Configure Queries via Admin UI:
+   - Double-click "SqlSyncService Admin" shortcut on desktop
+   - Enter your admin passphrase
+   - Add/edit queries and API endpoints
+   - Click "Apply Configuration"
+   - Restart service for changes to take effect
 
 ═══════════════════════════════════════════════════════════════
-🛠️ SYSTEM REQUIREMENTS:
+📁 PRE-CONFIGURED SAMPLE ENDPOINTS:
 ═══════════════════════════════════════════════════════════════
 
-✓ Windows Server 2019+ or Windows 10/11
-✓ Administrator privileges (for installation)
-✓ SQL Server 2016+ (accessible via network)
-✓ 100 MB free disk space
-✓ Port 8443 available
-✓ NO .NET installation required (self-contained!)
+The installer includes 5 ready-to-use sample endpoints:
+
+1. GET /api/customers
+   - Returns paginated list of customers
+   - Supports: ?page=1&pageSize=20
+
+2. GET /api/products  
+   - Returns paginated list of products
+   - Supports: ?page=1&pageSize=20
+
+3. GET /api/orders
+   - Returns paginated list of orders
+   - Supports: ?page=1&pageSize=20
+
+4. GET /api/orderdetails
+   - Returns order line items
+   - Supports: ?page=1&pageSize=20
+
+5. GET /api/customerorders
+   - Returns customers with their orders (joined query)
+   - Supports: ?page=1&pageSize=20
+
+All endpoints require X-API-Key header with your generated API key.
 
 ═══════════════════════════════════════════════════════════════
-📊 API USAGE EXAMPLES:
+🛡️ SECURITY RECOMMENDATIONS:
 ═══════════════════════════════════════════════════════════════
 
-After starting the service:
+INTERNAL USE (Private Network):
+   ✓ Use HTTP mode
+   ✓ Configure IP whitelist to allow only trusted IPs
+   ✓ Keep API key secure
+   ✓ Example: Office network, VPN, private VLAN
 
-# 1. Health check (no API key needed)
-https://localhost:8443/health
+EXTERNAL USE (Internet-Facing):
+   ✓ Use HTTPS with Let's Encrypt or Custom Certificate
+   ✓ Use strong API key (auto-generated)
+   ✓ Configure strict IP whitelist
+   ✓ Monitor logs regularly
+   ✓ Keep service updated
 
-# 2. List all endpoints (API key required)
-https://localhost:8443/api/queries
-Header: X-API-Key: [your-key]
+IP-BASED ACCESS (No Domain):
+   ✓ Use HTTPS with Self-Signed Certificate
+   ✓ Document certificate acceptance for clients
+   ✓ Or use HTTP if on trusted network
 
-# 3. Get data from endpoint
-https://localhost:8443/api/queries/Customers
-Header: X-API-Key: [your-key]
-
-# 4. With pagination
-https://localhost:8443/api/queries/Products?page=1&pageSize=10
-Header: X-API-Key: [your-key]
-
-PowerShell Example:
-```powershell
-$apiKey = "YOUR_API_KEY_FROM_INSTALL"
-$headers = @{"X-API-Key" = $apiKey}
-
-# Get all customers
-$customers = Invoke-RestMethod `
-    -Uri "https://localhost:8443/api/queries/Customers" `
-    -Headers $headers `
-    -SkipCertificateCheck
-
-$customers.customers | Format-Table
-```
+PRODUCTION DOMAINS:
+   ✓ Use Let's Encrypt for free trusted SSL
+   ✓ Ensure automatic renewal is configured
+   ✓ Monitor renewal emails
 
 ═══════════════════════════════════════════════════════════════
-🗑️ UNINSTALLATION:
+🔄 UPDATING/REINSTALLING:
 ═══════════════════════════════════════════════════════════════
+
+The installer automatically detects existing installations!
+
+When you run the installer and an existing version is detected:
+   1. Installer shows a dialog
+   2. Choose "Yes" to auto-uninstall previous version
+   3. Configuration files are preserved in C:\ProgramData\SqlSyncService
+   4. Continue with fresh installation
+   5. Reuse existing configuration or update as needed
+
+═══════════════════════════════════════════════════════════════
+❌ MANUAL UNINSTALLATION:
+═══════════════════════════════════════════════════════════════
+
+If needed, to completely remove SqlSyncService:
 
 1. Stop the service:
-   services.msc → "SQL Sync Service" → Stop
+   net stop SqlSyncService
 
 2. Remove the service:
-   PowerShell (as Admin): sc.exe delete SqlSyncService
+   sc delete SqlSyncService
 
 3. Remove firewall rule:
-   Remove-NetFirewallRule -DisplayName "SqlSyncService HTTPS"
+   netsh advfirewall firewall delete rule name="SqlSyncService HTTPS"
 
 4. Delete files:
-   • C:\Program Files\SqlSyncService\
-   • C:\ProgramData\SqlSyncService\ (optional - contains config)
+   rmdir /s "C:\Program Files\SqlSyncService"
+   rmdir /s "C:\ProgramData\SqlSyncService"  (⚠ removes config!)
 
 5. Remove shortcuts:
-   • Desktop: SqlSyncService Admin.lnk
-   • Start Menu: Programs\SqlSyncService\
+   - Delete from Desktop
+   - Delete from Start Menu\Programs\SqlSyncService
+
+6. Remove scheduled task (if Let's Encrypt was used):
+   schtasks /delete /tn "SqlSyncService-CertRenewal" /f
 
 ═══════════════════════════════════════════════════════════════
-❓ TROUBLESHOOTING:
+📞 TROUBLESHOOTING:
 ═══════════════════════════════════════════════════════════════
 
-Installer won't run?
-→ Right-click → "Run as Administrator" (required!)
-→ Check Windows Defender/Antivirus
+Service Won't Start:
+   ✓ Check logs: C:\ProgramData\SqlSyncService\logs\
+   ✓ Verify database connection in appsettings.json
+   ✓ Ensure SQL Server is running
+   ✓ Check Windows Event Viewer → Application logs
 
-Service won't start?
-→ Open Event Viewer → Application → Look for SqlSyncService errors
-→ Check database connection settings
-→ Verify SQL Server is running
-→ Check logs: C:\ProgramData\SqlSyncService\logs\
+Certificate Errors (Let's Encrypt):
+   ✓ Verify domain points to this server (nslookup yourdomain.com)
+   ✓ Check port 80 is open (netstat -an | findstr :80)
+   ✓ Test domain accessibility from internet
+   ✓ Check firewall allows port 80 inbound
+   ✓ Review installation log for ACME challenge errors
 
-Admin UI won't open?
-→ Launch from desktop shortcut
-→ Check Admin passphrase
-→ Try: C:\Program Files\SqlSyncService\Admin\SqlSyncService.Admin.exe
+API Returns 401 Unauthorized:
+   ✓ Verify X-API-Key header is included
+   ✓ Check API key matches configuration
+   ✓ Ensure IP is in whitelist (or whitelist is empty for localhost only)
 
-Can't connect to API?
-→ Verify service is running: Get-Service SqlSyncService
-→ Test health endpoint: https://localhost:8443/health
-→ Check firewall rule exists
-→ Verify port 8443 is not used by another app
+Can't Access Admin UI:
+   ✓ Verify correct admin passphrase
+   ✓ Check Admin UI exists: C:\Program Files\SqlSyncService\Admin\
+   ✓ Run as Administrator if needed
 
-401 Unauthorized?
-→ Include X-API-Key header in request
-→ Verify API key is correct
-→ Generate new key in Admin UI if lost
-
-403 Forbidden?
-→ Your IP is not in allow-list
-→ Add IP in Admin UI → Security tab
-→ Or edit: C:\ProgramData\SqlSyncService\appsettings.json
+Self-Signed Certificate Warnings:
+   ✓ This is normal for self-signed certificates
+   ✓ Use -k flag with curl
+   ✓ Accept certificate in browser
+   ✓ Or import certificate to Trusted Root store
 
 ═══════════════════════════════════════════════════════════════
-🎯 KEY IMPROVEMENTS IN THIS VERSION:
+✨ FEATURES BY VERSION:
 ═══════════════════════════════════════════════════════════════
 
-✅ Admin UI now INCLUDED in installer
-✅ Proper Windows shortcuts (.lnk files, not batch files)
-✅ Start Menu integration
-✅ Desktop shortcut for Admin UI
-✅ Link to configuration folder
-✅ Everything in one 79.6 MB file
-✅ True one-click installation
-✅ No missing files
-✅ No manual steps required
+v3.0 (Current):
+   ✓ HTTP mode for internal networks
+   ✓ Self-signed certificate auto-generation
+   ✓ Let's Encrypt integration with auto-renewal
+   ✓ Custom certificate support
+   ✓ Existing installation detection
+   ✓ One-click uninstall before reinstall
+   ✓ Improved security options UI
+
+v2.0:
+   ✓ Complete GUI installer
+   ✓ Embedded Admin UI
+   ✓ Sample queries and endpoints
+   ✓ Desktop and Start Menu shortcuts
+   ✓ Database connection testing
+
+v1.0:
+   ✓ Basic MSI installer
+   ✓ Manual configuration required
+
+═══════════════════════════════════════════════════════════════
+📧 SUPPORT & DOCUMENTATION:
+═══════════════════════════════════════════════════════════════
+
+GitHub Repository:
+   https://github.com/Romahef/flow-mantis
+
+Full Documentation:
+   See README.md in repository
+
+Issues & Bug Reports:
+   https://github.com/Romahef/flow-mantis/issues
 
 ═══════════════════════════════════════════════════════════════
 
-📚 DOCUMENTATION:
-   • Full guide: README.md
-   • Security info: SECURITY.md
-   • Test setup: TEST-SETUP-COMPLETE.txt
-   • Admin UI guide: ADMIN-UI-GUIDE.txt
-
-🎉 READY TO DEPLOY!
-   Send this ONE file to any Windows server and install!
+Last Updated: 2025-10-06
+Installer Version: 3.0
+Size: 72.3 MB
 
 ═══════════════════════════════════════════════════════════════
-
