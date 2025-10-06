@@ -14,7 +14,12 @@ public partial class LoginWindow : Window
     {
         InitializeComponent();
         _authService = authService;
-        PassphraseBox.Focus();
+        
+        // Set focus after window is loaded
+        Loaded += (s, e) => {
+            PassphraseBox.Focus();
+            Keyboard.Focus(PassphraseBox);
+        };
     }
 
     private void LoginButton_Click(object sender, RoutedEventArgs e)
