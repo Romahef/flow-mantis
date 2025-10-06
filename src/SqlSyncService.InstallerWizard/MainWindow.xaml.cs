@@ -685,8 +685,12 @@ public partial class MainWindow : Window
                 writer.WriteStringValue(ip);
             }
             writer.WriteEndArray();
+            writer.WriteEndObject();
             
-            writer.WriteString("AdminPassphraseHash", HashPassphrase(TxtAdminPassphrase.Password));
+            // Admin section
+            writer.WriteStartObject("Admin");
+            writer.WriteString("ListenUrl", "https://localhost:9443");
+            writer.WriteString("PassphraseEncrypted", ProtectString(HashPassphrase(TxtAdminPassphrase.Password)));
             writer.WriteEndObject();
             
             // Logging section
