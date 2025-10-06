@@ -196,18 +196,79 @@ public partial class MainWindow : Window
 
                 // Remove old files (but keep configuration)
                 LogInstall("Removing old files (preserving configuration)...");
+                
+                // Kill any running Admin UI processes first
+                try
+                {
+                    var adminProcesses = Process.GetProcessesByName("SqlSyncService.Admin");
+                    foreach (var proc in adminProcesses)
+                    {
+                        try
+                        {
+                            proc.Kill();
+                            proc.WaitForExit(2000);
+                            LogInstall("Stopped running Admin UI");
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+                
+                Thread.Sleep(1000); // Give processes time to fully exit
+                
                 try
                 {
                     if (Directory.Exists(InstallPath))
                     {
-                        Directory.Delete(InstallPath, true);
-                        LogInstall("Old files removed");
+                        // Try multiple times if files are locked
+                        int attempts = 0;
+                        bool deleted = false;
+                        
+                        while (attempts < 3 && !deleted)
+                        {
+                            try
+                            {
+                                Directory.Delete(InstallPath, true);
+                                deleted = true;
+                                LogInstall("Old files removed successfully");
+                            }
+                            catch
+                            {
+                                attempts++;
+                                if (attempts < 3)
+                                {
+                                    Thread.Sleep(1000);
+                                    LogInstall($"Retrying file deletion (attempt {attempts + 1}/3)...");
+                                }
+                            }
+                        }
+                        
+                        if (!deleted)
+                        {
+                            LogInstall($"Warning: Could not remove all files after 3 attempts");
+                            LogInstall("Trying to remove Admin folder specifically...");
+                            
+                            // Try to at least remove the Admin folder
+                            var adminPath = Path.Combine(InstallPath, "Admin");
+                            if (Directory.Exists(adminPath))
+                            {
+                                try
+                                {
+                                    Directory.Delete(adminPath, true);
+                                    LogInstall("Admin UI folder removed");
+                                }
+                                catch (Exception adminEx)
+                                {
+                                    LogInstall($"Warning: Could not remove Admin UI: {adminEx.Message}");
+                                }
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogInstall($"Warning: Could not remove all files: {ex.Message}");
-                    LogInstall("You may need to manually remove: " + InstallPath);
+                    LogInstall($"Warning: Error during file removal: {ex.Message}");
+                    LogInstall("Installation will continue...");
                 }
             }
             catch (Exception ex)
