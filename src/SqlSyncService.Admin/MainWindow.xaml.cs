@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
+using Microsoft.Data.SqlClient;
 using SqlSyncService.Config;
 using SqlSyncService.Admin.Services;
 using SqlSyncService.Database;
@@ -35,38 +36,70 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Show login dialog
-        var loginWindow = new LoginWindow(_authService);
-        var result = loginWindow.ShowDialog();
-
-        if (result != true)
+        try
         {
-            Close();
-            return;
-        }
+            // Show login dialog
+            var loginWindow = new LoginWindow(_authService);
+            var result = loginWindow.ShowDialog();
 
-        // Load configuration
-        LoadConfiguration();
+            if (result != true)
+            {
+                _logger.LogInformation("User cancelled login");
+                Application.Current.Shutdown();
+                return;
+            }
+
+            // Load configuration
+            _logger.LogInformation("User authenticated, loading configuration");
+            LoadConfiguration();
+            _logger.LogInformation("Configuration loaded successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Fatal error during startup");
+            MessageBox.Show($"Fatal error during startup:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Application.Current.Shutdown();
+        }
     }
 
     private void LoadConfiguration()
     {
         try
         {
+            _logger.LogInformation("Loading app settings");
             _settings = _configStore.LoadAppSettings();
+            
+            _logger.LogInformation("Loading queries");
             _queries = _configStore.LoadQueries();
+            
+            _logger.LogInformation("Loading mapping");
             _mapping = _configStore.LoadMapping();
 
             // Populate UI
+            _logger.LogInformation("Populating Security tab");
             PopulateSecurityTab();
+            
+            _logger.LogInformation("Populating Database tab");
             PopulateDatabaseTab();
+            
+            _logger.LogInformation("Populating Queries tab");
             PopulateQueriesTab();
+            
+            _logger.LogInformation("Populating Mapping tab");
             PopulateMappingTab();
+            
+            _logger.LogInformation("Populating About tab");
             PopulateAboutTab();
+            
+            _logger.LogInformation("All tabs populated successfully");
         }
         catch (Exception ex)
         {
-            ShowError($"Failed to load configuration: {ex.Message}");
+            _logger.LogError(ex, "Failed to load configuration");
+            MessageBox.Show($"Failed to load configuration:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}", "Configuration Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            
+            // Re-throw so the outer handler can decide whether to close the app
+            throw;
         }
     }
 
@@ -77,6 +110,18 @@ public partial class MainWindow : Window
 
         // Certificate Path
         CertPathTextBox.Text = _settings.Security.Certificate.Path;
+        
+        // API Port - extract from Service.ListenUrl
+        try
+        {
+            var listenUrl = _settings.Service.ListenUrl ?? "http://localhost:8080";
+            var uri = new Uri(listenUrl);
+            TxtApiPortAdmin.Text = uri.Port.ToString();
+        }
+        catch
+        {
+            TxtApiPortAdmin.Text = "8080"; // Default
+        }
     }
 
     private void PopulateDatabaseTab()
@@ -85,6 +130,21 @@ public partial class MainWindow : Window
         DbPortTextBox.Text = _settings.Database.Port.ToString();
         DbNameTextBox.Text = _settings.Database.Database;
         DbInstanceTextBox.Text = _settings.Database.Instance;
+        
+        // Display decrypted username
+        try
+        {
+            var username = ConfigStore.Secrets.GetDatabaseUsername(_settings);
+            DbUsernameTextBox.Text = username;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to decrypt database username");
+            DbUsernameTextBox.Text = "";
+        }
+        
+        // Password field stays empty for security (user can enter new password if needed)
+        DbPasswordBox.Password = "";
     }
 
     private void PopulateQueriesTab()
@@ -146,6 +206,36 @@ public partial class MainWindow : Window
         else
         {
             LoadConfiguration(); // Reload to revert
+        }
+    }
+    
+    private void UpdateApiPort_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Validate port
+            if (!int.TryParse(TxtApiPortAdmin.Text, out int port) || port < 1024 || port > 65535)
+            {
+                ShowError("Please enter a valid port number (1024-65535)");
+                return;
+            }
+            
+            // Extract protocol from current Service.ListenUrl
+            var currentUrl = _settings.Service.ListenUrl ?? "http://localhost:8080";
+            var currentUri = new Uri(currentUrl);
+            var protocol = currentUri.Scheme; // http or https
+            
+            // Update Service.ListenUrl with new port
+            _settings.Service.ListenUrl = $"{protocol}://0.0.0.0:{port}";
+            
+            // Save configuration
+            _configStore.SaveAppSettings(_settings);
+            
+            ShowSuccess($"API port updated to {port}. Please restart the SqlSyncService for changes to take effect.");
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Failed to update API port: {ex.Message}");
         }
     }
 
@@ -245,33 +335,135 @@ public partial class MainWindow : Window
     }
 
     // Database Tab Handlers
-    private async void TestConnection_Click(object sender, RoutedEventArgs e)
+    private void SaveCredentials_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            // Update settings from UI
+            if (string.IsNullOrWhiteSpace(DbUsernameTextBox.Text))
+            {
+                ShowError("Username cannot be empty");
+                return;
+            }
+
+            // Update server settings
             _settings.Database.Server = DbServerTextBox.Text;
             _settings.Database.Port = int.Parse(DbPortTextBox.Text);
             _settings.Database.Database = DbNameTextBox.Text;
             _settings.Database.Instance = DbInstanceTextBox.Text;
-
-            var connectionFactory = new ConnectionFactory(_settings, 
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<ConnectionFactory>.Instance);
             
-            var (success, message) = await connectionFactory.TestConnectionAsync();
-
-            if (success)
+            // Update username (always encrypt from UI value)
+            _settings.Database.UsernameEncrypted = SecretsProtector.Protect(DbUsernameTextBox.Text);
+            
+            // Update password only if a new one is provided
+            if (!string.IsNullOrEmpty(DbPasswordBox.Password))
             {
-                ShowSuccess($"✓ {message}");
+                _settings.Database.PasswordEncrypted = SecretsProtector.Protect(DbPasswordBox.Password);
             }
-            else
-            {
-                ShowError($"✗ {message}");
-            }
+            
+            // Save configuration
+            _configStore.SaveAppSettings(_settings);
+            
+            ShowSuccess("✓ Database credentials saved successfully! Please restart the SqlSyncService for changes to take effect.");
+            _logger.LogInformation("Database credentials updated");
         }
         catch (Exception ex)
         {
-            ShowError($"Connection test failed: {ex.Message}");
+            _logger.LogError(ex, "Failed to save credentials");
+            ShowError($"Failed to save credentials: {ex.Message}");
+        }
+    }
+    
+    private async void TestConnection_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _logger.LogInformation("Starting database connection test");
+            
+            // Get credentials from UI or encrypted storage
+            string username, password;
+            
+            // If username is in UI, use it; otherwise try to decrypt from config
+            if (!string.IsNullOrWhiteSpace(DbUsernameTextBox.Text))
+            {
+                username = DbUsernameTextBox.Text;
+            }
+            else if (!string.IsNullOrWhiteSpace(_settings.Database.UsernameEncrypted))
+            {
+                try
+                {
+                    username = ConfigStore.Secrets.GetDatabaseUsername(_settings);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to decrypt username");
+                    ShowError("Failed to decrypt username from configuration. Please enter credentials above.");
+                    return;
+                }
+            }
+            else
+            {
+                ShowError("Username is not configured. Please enter username and password above, then click 'Save Credentials'.");
+                return;
+            }
+            
+            // If password is in UI, use it; otherwise try to decrypt from config
+            if (!string.IsNullOrEmpty(DbPasswordBox.Password))
+            {
+                password = DbPasswordBox.Password;
+            }
+            else if (!string.IsNullOrWhiteSpace(_settings.Database.PasswordEncrypted))
+            {
+                try
+                {
+                    password = ConfigStore.Secrets.GetDatabasePassword(_settings);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to decrypt password");
+                    ShowError("Failed to decrypt password from configuration. Please enter credentials above.");
+                    return;
+                }
+            }
+            else
+            {
+                ShowError("Password is not configured. Please enter username and password above, then click 'Save Credentials'.");
+                return;
+            }
+            
+            _logger.LogInformation($"Testing connection with username: {username}");
+            
+            // Build connection string directly for testing
+            var server = DbServerTextBox.Text;
+            var port = int.Parse(DbPortTextBox.Text);
+            var database = DbNameTextBox.Text;
+            var instance = DbInstanceTextBox.Text;
+            
+            var dataSource = string.IsNullOrWhiteSpace(instance)
+                ? $"{server},{port}"
+                : $"{server}\\{instance}";
+            
+            var connectionString = $"Data Source={dataSource};Initial Catalog={database};" +
+                                 $"User ID={username};Password={password};" +
+                                 $"TrustServerCertificate=True;Encrypt=True;ConnectTimeout=10";
+            
+            _logger.LogInformation($"Testing connection to {dataSource}/{database}");
+            
+            using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+            await connection.OpenAsync();
+            
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT @@VERSION";
+            command.CommandTimeout = 5;
+            
+            var version = await command.ExecuteScalarAsync();
+            
+            _logger.LogInformation("Connection test successful");
+            ShowSuccess($"✓ Connection successful!\n\nServer version: {version}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Connection test failed");
+            ShowError($"✗ Connection test failed:\n\n{ex.Message}");
         }
     }
 
@@ -288,19 +480,45 @@ public partial class MainWindow : Window
 
     private void EditQuery_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement element && element.DataContext != null)
+        try
         {
-            var queryView = element.DataContext;
-            var query = queryView.GetType().GetProperty("Query")?.GetValue(queryView) as QueryDefinition;
-            
-            if (query != null)
+            if (sender is FrameworkElement element && element.DataContext != null)
             {
+                var queryView = element.DataContext;
+                var queryProperty = queryView.GetType().GetProperty("Query");
+                
+                if (queryProperty == null)
+                {
+                    _logger.LogError("Query property not found in DataContext");
+                    ShowError("Failed to access query data. Please try again.");
+                    return;
+                }
+                
+                var query = queryProperty.GetValue(queryView) as QueryDefinition;
+                
+                if (query == null)
+                {
+                    _logger.LogError("Query property returned null");
+                    ShowError("Failed to load query data. Please try again.");
+                    return;
+                }
+                
                 var dialog = new QueryEditorWindow(query);
                 if (dialog.ShowDialog() == true)
                 {
                     PopulateQueriesTab();
                 }
             }
+            else
+            {
+                _logger.LogError("EditQuery_Click: sender or DataContext is null");
+                ShowError("Failed to access query data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error opening query editor");
+            ShowError($"Error opening query editor: {ex.Message}");
         }
     }
 

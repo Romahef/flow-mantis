@@ -9,28 +9,46 @@ public partial class QueryEditorWindow : Window
 
     public QueryEditorWindow(QueryDefinition query)
     {
-        InitializeComponent();
-        Query = query;
-        LoadQuery();
+        try
+        {
+            InitializeComponent();
+            Query = query;
+            LoadQuery();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error initializing Query Editor:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}", 
+                "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            throw;
+        }
     }
 
     private void LoadQuery()
     {
-        if (Query == null) return;
-
-        QueryNameTextBox.Text = Query.Name;
-        SqlTextBox.Text = Query.Sql;
-        PaginableCheckBox.IsChecked = Query.Paginable;
-
-        if (Query.PaginationMode == "Token")
+        try
         {
-            PaginationModeComboBox.SelectedIndex = 1;
+            if (Query == null) return;
+
+            QueryNameTextBox.Text = Query.Name ?? "";
+            SqlTextBox.Text = Query.Sql ?? "";
+            PaginableCheckBox.IsChecked = Query.Paginable;
+
+            if (Query.PaginationMode == "Token")
+            {
+                PaginationModeComboBox.SelectedIndex = 1;
+            }
+
+            OrderByTextBox.Text = Query.OrderBy ?? "";
+            KeyColumnsTextBox.Text = Query.KeyColumns != null ? string.Join(", ", Query.KeyColumns) : "";
+
+            UpdatePaginationPanels();
         }
-
-        OrderByTextBox.Text = Query.OrderBy;
-        KeyColumnsTextBox.Text = string.Join(", ", Query.KeyColumns);
-
-        UpdatePaginationPanels();
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading query data:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}", 
+                "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            throw;
+        }
     }
 
     private void PaginableCheckBox_Changed(object sender, RoutedEventArgs e)
@@ -45,6 +63,11 @@ public partial class QueryEditorWindow : Window
 
     private void UpdatePaginationPanels()
     {
+        // Null checks to prevent errors during initialization
+        if (PaginableCheckBox == null || PaginationModeComboBox == null || 
+            OffsetPanel == null || TokenPanel == null)
+            return;
+
         var isPaginable = PaginableCheckBox.IsChecked == true;
         var isOffset = PaginationModeComboBox.SelectedIndex == 0;
 

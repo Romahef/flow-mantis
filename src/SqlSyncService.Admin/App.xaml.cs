@@ -15,14 +15,33 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Setup dependency injection
-        var services = new ServiceCollection();
-        ConfigureServices(services);
-        _serviceProvider = services.BuildServiceProvider();
+        // Add global exception handler for unhandled exceptions
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-        // Show main window
-        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-        mainWindow.Show();
+        try
+        {
+            // Setup dependency injection
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider();
+
+            // Show main window
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to start application:\n\n{ex.Message}", 
+                "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(1);
+        }
+    }
+
+    private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        MessageBox.Show($"An unexpected error occurred:\n\n{e.Exception.Message}", 
+            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        e.Handled = true;
     }
 
     private void ConfigureServices(IServiceCollection services)

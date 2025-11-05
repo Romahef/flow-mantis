@@ -23,10 +23,10 @@ public static class StartupValidator
                            listenUri.Host == "127.0.0.1" || 
                            listenUri.Host == "::1";
 
-            // Rule 1: HTTPS required
-            if (!settings.Security.EnableHttps && listenUri.Scheme != "https")
+            // Rule 1: HTTPS required (except for localhost testing)
+            if (!settings.Security.EnableHttps && listenUri.Scheme != "https" && !isLoopback)
             {
-                errors.Add("HTTPS is disabled but required. Set Security.EnableHttps=true");
+                errors.Add("HTTPS is disabled but required for non-localhost addresses. Set Security.EnableHttps=true");
             }
 
             // Rule 2: If bound to non-loopback and HTTPS disabled → fail

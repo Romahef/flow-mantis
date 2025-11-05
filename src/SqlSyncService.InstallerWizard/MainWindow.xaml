@@ -137,29 +137,36 @@
                     <TextBlock Text="Used to access the Admin UI application" 
                                Foreground="#7F8C8D" FontSize="11" Margin="0,5,0,0"/>
                     
+                    <TextBlock Text="API Listen Port:" Margin="0,15,0,5"/>
+                    <TextBox x:Name="TxtApiPort" Text="8080" Padding="8" FontSize="14" Width="150" HorizontalAlignment="Left"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#3498DB" FontSize="11" Margin="0,5,0,0">
+                        Port for incoming API requests. You'll need to configure port forwarding on your router to this port.
+                        Common choices: 8080 (HTTP), 8443 (HTTPS), or any available port (1024-65535).
+                    </TextBlock>
+                    
                     <TextBlock Text="Connection Security:" Margin="0,20,0,5" FontSize="14" FontWeight="SemiBold"/>
-                    <RadioButton x:Name="RbHttp" Content="HTTP (No Encryption) - Port 8080" 
+                    <RadioButton x:Name="RbHttp" Content="HTTP (No Encryption)" 
                                  GroupName="SecurityMode" IsChecked="True" Margin="0,8,0,5"
                                  Checked="SecurityMode_Changed"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#95A5A6" FontSize="10" Margin="25,0,0,8">
                         Best for internal networks with IP addresses. No certificate required.
                     </TextBlock>
                     
-                    <RadioButton x:Name="RbHttpsSelfSigned" Content="HTTPS with Self-Signed Certificate - Port 8443" 
+                    <RadioButton x:Name="RbHttpsSelfSigned" Content="HTTPS with Self-Signed Certificate" 
                                  GroupName="SecurityMode" Margin="0,5,0,5"
                                  Checked="SecurityMode_Changed"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#95A5A6" FontSize="10" Margin="25,0,0,8">
                         Encrypted connection. Works with IP addresses. Clients must accept self-signed certificate.
                     </TextBlock>
                     
-                    <RadioButton x:Name="RbHttpsLetsEncrypt" Content="HTTPS with Let's Encrypt (Free SSL) - Port 8443" 
+                    <RadioButton x:Name="RbHttpsLetsEncrypt" Content="HTTPS with Let's Encrypt (Free SSL)" 
                                  GroupName="SecurityMode" Margin="0,5,0,5"
                                  Checked="SecurityMode_Changed"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#95A5A6" FontSize="10" Margin="25,0,0,8">
                         Free trusted SSL certificate. Requires a public domain name pointing to this server.
                     </TextBlock>
                     
-                    <RadioButton x:Name="RbHttpsCustomCert" Content="HTTPS with Custom Certificate (.pfx) - Port 8443" 
+                    <RadioButton x:Name="RbHttpsCustomCert" Content="HTTPS with Custom Certificate (.pfx)" 
                                  GroupName="SecurityMode" Margin="0,5,0,5"
                                  Checked="SecurityMode_Changed"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#95A5A6" FontSize="10" Margin="25,0,0,8">

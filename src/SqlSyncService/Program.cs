@@ -73,8 +73,12 @@ public class Program
         {
             var uri = new Uri(appSettings.Service.ListenUrl);
             
-            options.Listen(System.Net.IPAddress.Parse(uri.Host == "0.0.0.0" ? "0.0.0.0" : uri.Host), 
-                uri.Port, listenOptions =>
+            // Parse host to IP address (handle "localhost" hostname)
+            var ipAddress = uri.Host == "localhost" ? System.Net.IPAddress.Loopback :
+                           uri.Host == "0.0.0.0" ? System.Net.IPAddress.Any :
+                           System.Net.IPAddress.Parse(uri.Host);
+            
+            options.Listen(ipAddress, uri.Port, listenOptions =>
             {
                 if (appSettings.Security.EnableHttps)
                 {

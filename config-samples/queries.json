@@ -1,46 +1,55 @@
 {
   "Queries": [
     {
-      "Name": "Warehouses",
-      "Sql": "SELECT whs_ID, whs_Code, whs_Name, whs_Address, whs_Active FROM Warehouses WHERE whs_Active = 1",
+      "Name": "LS",
+      "Sql": "select los_ID, los_Code, los_Description from COM_LogisticSite",
       "Paginable": false
     },
     {
-      "Name": "StockOwners",
-      "Sql": "SELECT own_ID, own_Code, own_Name, own_Active FROM StockOwners WHERE own_Active = 1",
-      "Paginable": false
+      "Name": "DEPOSITOR",
+      "Sql": "select dep_ID, dep_Code, cmp_FullName, cmp_Address, cmp_City, cmp_ZipCode, cmp_Phone, cmp_Responsible, cmp_Fax, cmp_AFM, cmp_DUNSNumber, cmp_LastUpdateTime from LV_Depositor (nolock) inner join LV_Company (nolock) on dep_CompanyID = cmp_ID group by dep_ID, dep_Code, cmp_ID, cmp_FullName, cmp_Address, cmp_City, cmp_ZipCode, cmp_Phone, cmp_Responsible, cmp_Fax, cmp_AFM, cmp_DUNSNumber, cmp_LastUpdateTime",
+      "Paginable": true,
+      "PaginationMode": "Offset",
+      "OrderBy": "dep_ID"
     },
     {
-      "Name": "Customers",
-      "Sql": "SELECT cus_ID, cus_Code, cus_Name, cus_Email, cus_Phone, cus_Address, cus_Active, cus_CreatedDate FROM Customers WHERE cus_Active = 1",
+      "Name": "CUSTOMER",
+      "Sql": "select dep_ID, dep_Code, cus_ID, cus_Code, cmp_FullName, cmp_Address, cmp_City, cmp_ZipCode, cmp_Phone, cmp_Responsible, cud_Address, cud_City, cud_ZipCode, cud_Phone, cud_Contact, cud_AddressNotes, cus_LastUpdateTime from LV_Customer (nolock) inner join LV_Company (nolock) on cus_CompanyID = cmp_ID inner join LV_CustomerDelivery (nolock) on cus_ID = cud_CustomerID inner join LV_Depositor (nolock) on dep_ID = cus_DepositorID group by dep_ID, dep_Code, cus_Code, cmp_ID, cmp_FullName, cmp_Address, cmp_City, cmp_ZipCode, cmp_Phone, cmp_Responsible, cud_Address, cus_ID, cud_City, cud_ZipCode, cud_Phone, cud_Contact, cud_AddressNotes, cus_LastUpdateTime",
       "Paginable": true,
       "PaginationMode": "Offset",
       "OrderBy": "cus_ID"
     },
     {
-      "Name": "Items",
-      "Sql": "SELECT prd_ID, prd_Code, prd_Name, prd_Description, prd_UnitPrice, prd_Active FROM Products WHERE prd_Active = 1",
+      "Name": "ITEMS",
+      "Sql": "select distinct dep_ID, dep_code, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description, prdl_ShortDescription from LV_Product (nolock) inner join LV_ProductLang (nolock) on prd_ID=prdl_ProductID and prdl_LanguageID = 10 inner join LV_ProductDepositor (nolock) on prd_ID = pdp_ProductID inner join LV_Depositor (nolock) on dep_ID = pdp_DepositorID inner join LV_DepositorAttributeValues (nolock) on pdp_DepositorID = dev_DepositorID and dev_AttributeID = 2 left outer join LV_ProductBarcode (nolock) on pbc_ProductID = prd_ID group by dep_ID, dep_code, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description, prdl_ShortDescription",
       "Paginable": true,
       "PaginationMode": "Offset",
       "OrderBy": "prd_ID"
     },
     {
-      "Name": "StockItems",
-      "Sql": "SELECT p.prd_ID, p.prd_Code, p.prd_Barcode, p.prd_Weight, p.prd_Volume, COALESCE(SUM(s.stc_Quantity), 0) AS prd_StockLevel FROM Products p LEFT JOIN Stock s ON p.prd_ID = s.stc_ProductID WHERE p.prd_Active = 1 GROUP BY p.prd_ID, p.prd_Code, p.prd_Barcode, p.prd_Weight, p.prd_Volume",
+      "Name": "ITEMS_STOCK",
+      "Sql": "select dep_ID, dep_Code, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_ShortDescription, sum(spt_CUQuantity) PC_QTY, sum(spt_CUQuantityFree) PC_QTYFree, sum(spt_Quantity) CRT_QTY, sum(spt_QuantityFree) CRT_QTYFree, PendReceiptQty, PendOrderQty, los_ID, los_Code, los_Description, pls_SafetyStock from LV_Stock(nolock) inner join LV_StockPackType (nolock) on stk_ID = spt_StockID and spt_ParentID is null inner join LV_Product (nolock) on stk_ProductID=prd_ID inner join LV_ProductLang (nolock) on prd_ID=prdl_ProductID and prdl_LanguageID = 10 inner join LV_Location (nolock) on stk_LocationID=loc_ID inner join COM_LogisticUnit (nolock) on stk_LogisticUnitID = lou_ID inner join COM_LogisticSite (nolock) on lou_LogisticSiteID = los_ID inner join LV_ProductLS (nolock) on prd_ID = pls_ProductID and pls_LogisticSiteID = los_ID inner join lv_depositor (nolock) on stk_DepositorID=dep_ID inner join LV_DepositorAttributeValues (nolock) on stk_DepositorID = dev_DepositorID and dev_AttributeID = 2 left outer join (select ord_LogisticSiteID, ori_ProductID, sum(ori_Quantity) PendOrderQty from LV_Order (nolock) inner join LV_OrderItem (nolock) on ord_ID = ori_OrderID where ord_StatusID = 1 group by ord_LogisticSiteID, ori_ProductID) PendOrder on PendOrder.ori_ProductID = prd_ID and PendOrder.ord_LogisticSiteID = los_ID left outer join (select rct_LogisticSiteID, rci_ProductID, sum(rci_ExpQuantity) PendReceiptQty from LV_Receipt (nolock) inner join LV_ReceiptItem (nolock) on rct_ID = rci_ReceiptID where rct_ProgressID = 1 group by rct_LogisticSiteID, rci_ProductID) PendReceipt on PendReceipt.rci_ProductID = prd_ID and PendReceipt.rct_LogisticSiteID = los_ID where prd_PrimaryCode = 'AC' and dep_Code = 'AC' group by dep_ID, dep_Code, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_ShortDescription, los_ID, los_Code, los_Description, pls_SafetyStock, PendReceiptQty, PendOrderQty order by dep_Code, prd_PrimaryCode",
       "Paginable": true,
       "PaginationMode": "Offset",
       "OrderBy": "prd_ID"
     },
     {
-      "Name": "Inventory",
-      "Sql": "SELECT stc_ID, stc_SSCC, stc_ProductID, stc_WarehouseID, stc_Quantity, stc_Location, stc_EntryDate AS SSCCEntryDate, stc_ExpiryDate FROM Stock WHERE stc_Quantity > 0",
+      "Name": "DETAILED_STOCK",
+      "Sql": "select X.dep_ID, X.dep_Code, X.stc_SSCC, X.SSCCEntryDate, X.SSCC_Unit, X.DaysInStock, X.prd_ID, X.prd_PrimaryCode, X.prd_SecondaryCode, X.prdl_ShortDescription, X.PC_QTY, X.PC_QTYFree, X.CRT_QTY, X.CRT_QTYFree, X.los_ID, X.los_Code, X.los_Description from (select dep_ID, dep_Code, null stc_SSCC, null as SSCCEntryDate, 'ללא' SSCC_Unit, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description as prdl_ShortDescription, sum(spt_CUQuantity) PC_QTY, sum(spt_CUQuantityFree) PC_QTYFree, sum(spt_Quantity) CRT_QTY, sum(spt_QuantityFree) CRT_QTYFree, los_ID, los_Code, los_Description, null as DaysInStock from LV_Stock(nolock) inner join LV_StockPackType (nolock) on spt_StockID = stk_ID and spt_ParentID is null inner join LV_ItemUnit (nolock) on itu_ID = spt_ItemUnitID inner join LV_Unit ITEMUNT (nolock) on itu_UnitID = ITEMUNT.unt_ID inner join LV_UnitLang ITEM_UNTLANG (nolock) on untl_UnitID = ITEMUNT.unt_ID and ITEM_UNTLANG.untl_LanguageID = 10 inner join LV_Product (nolock) on stk_ProductID=prd_ID inner join LV_ProductLang (nolock) on prd_ID=prdl_ProductID and prdl_LanguageID = 10 inner join LV_Location (nolock) on stk_LocationID=loc_ID inner join COM_LogisticUnit (nolock) on stk_LogisticUnitID = lou_ID inner join COM_LogisticSite (nolock) on lou_LogisticSiteID = los_ID inner join lv_depositor (nolock) on stk_DepositorID=dep_ID inner join LV_DepositorAttributeValues (nolock) on stk_DepositorID = dev_DepositorID and dev_AttributeID = 2 where stk_ContainerID is null and prd_PrimaryCode = 'AC' and dep_Code = 'AC' group by dep_ID, dep_Code, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description, los_ID, los_Code, los_Description union select dep_ID, dep_Code, stc_SSCC, convert(varchar (10),stc_EntryDate,103) as SSCCEntryDate, SSCC_UNTLANG.untl_Description as SSCC_Unit, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description as prdl_ShortDescription, spt_CUQuantity PC_QTY, spt_CUQuantityFree PC_QTYFree, spt_Quantity CRT_QTY, spt_QuantityFree CRT_QTYFree, los_ID, los_Code, los_Description, datediff(day,stc_EntryDate,GETDATE()) as DaysInStock from LV_Stock(nolock) inner join LV_StockPackType (nolock) on spt_StockID = stk_ID and spt_ParentID is null inner join LV_StockContainer (nolock) on stk_ContainerID = stc_ID inner join LV_ItemUnit (nolock) on itu_ID = spt_ItemUnitID inner join LV_Unit ITEMUNT (nolock) on itu_UnitID = ITEMUNT.unt_ID inner join LV_UnitLang ITEM_UNTLANG (nolock) on untl_UnitID = ITEMUNT.unt_ID and ITEM_UNTLANG.untl_LanguageID = 10 inner join LV_Unit SSCCUNT(nolock) on SSCCUNT.unt_ID = stc_UnitID inner join LV_UnitLang SSCC_UNTLANG (nolock) on SSCC_UNTLANG.untl_UnitID = SSCCUNT.unt_ID and SSCC_UNTLANG.untl_LanguageID = 10 inner join LV_Product (nolock) on stk_ProductID=prd_ID inner join LV_ProductLang (nolock) on prd_ID=prdl_ProductID and prdl_LanguageID = 10 inner join LV_Location (nolock) on stk_LocationID=loc_ID inner join COM_LogisticUnit (nolock) on stk_LogisticUnitID = lou_ID inner join COM_LogisticSite (nolock) on lou_LogisticSiteID = los_ID inner join lv_depositor (nolock) on stk_DepositorID=dep_ID inner join LV_DepositorAttributeValues (nolock) on stk_DepositorID = dev_DepositorID and dev_AttributeID = 2 left outer join LV_Receipt (nolock) on stc_ReceiptID = rct_ID where prd_PrimaryCode = 'AC' and dep_Code = 'AC' group by dep_ID, dep_Code, stc_SSCC, stc_EntryDate, SSCC_UNTLANG.untl_Description, prd_ID, prd_PrimaryCode, prd_SecondaryCode, prdl_Description, spt_CUQuantity, spt_CUQuantityFree, spt_Quantity, spt_QuantityFree, los_ID, los_Code, los_Description) X order by los_Code",
+      "Paginable": true,
+      "PaginationMode": "Offset",
+      "OrderBy": "prd_ID"
+    },
+    {
+      "Name": "ORDER_STATUS",
+      "Sql": "select dep_ID, dep_Code, ord_Code, ord_StatusID, msg_Greek, ord_InputDate, orc_Code, orc_FullName, orc_Address, orc_City from LV_Order (nolock) inner join LV_OrderCustomer (nolock) on ord_ID = orc_OrderID inner join LV_Depositor (nolock) on dep_ID = ord_DepositorID inner join LV_ProgressStatus (nolock) on pst_ID = ord_StatusID inner join LV_Messages (nolock) on msg_code = pst_MessageCode and msg_languageID = 10 where ord_StatusID in (1,2) group by dep_ID, dep_Code, ord_Code, ord_StatusID, msg_Greek, ord_InputDate, orc_Code, orc_FullName, orc_Address, orc_City",
       "Paginable": true,
       "PaginationMode": "Token",
-      "KeyColumns": ["SSCCEntryDate", "stc_SSCC"]
+      "KeyColumns": ["ord_InputDate", "ord_Code"]
     },
     {
-      "Name": "InventoryMovement",
-      "Sql": "SELECT rct_ID, rct_Code, rct_Type, rct_ProductID, rct_WarehouseID, rct_Quantity, rct_InputDate, rct_Reference FROM Receipts WHERE rct_InputDate >= DATEADD(day, -30, GETDATE())",
+      "Name": "RECEIPT_STATUS",
+      "Sql": "select dep_ID, dep_Code, rct_Code, rct_ProgressID, msg_Greek, rct_InputDate, rct_LastUpdateTime from LV_Receipt (nolock) inner join LV_Depositor (nolock) on dep_ID = rct_DepositorID inner join LV_ProgressStatus (nolock) on pst_ID = rct_ProgressID inner join LV_Messages (nolock) on msg_code = pst_MessageCode and msg_languageID = 10 where rct_ProgressID in (1,2) group by dep_ID, dep_Code, rct_Code, rct_ProgressID, msg_Greek, rct_InputDate, rct_LastUpdateTime",
       "Paginable": true,
       "PaginationMode": "Token",
       "KeyColumns": ["rct_InputDate", "rct_Code"]

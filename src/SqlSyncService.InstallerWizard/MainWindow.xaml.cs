@@ -418,6 +418,14 @@ public partial class MainWindow : Window
                 return false;
             }
             
+            // Validate port
+            if (!int.TryParse(TxtApiPort.Text, out int port) || port < 1024 || port > 65535)
+            {
+                MessageBox.Show("Please enter a valid port number (1024-65535).\n\nCommon ports:\n• 8080 for HTTP\n• 8443 for HTTPS", 
+                    "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+            
             // Validate Let's Encrypt fields
             if (RbHttpsLetsEncrypt.IsChecked == true)
             {
@@ -526,6 +534,29 @@ public partial class MainWindow : Window
                 PnlCertificateUpload.Visibility = RbHttpsCustomCert.IsChecked == true 
                     ? Visibility.Visible 
                     : Visibility.Collapsed;
+            }
+            
+            // Suggest default port based on HTTP/HTTPS (only if port hasn't been manually changed)
+            if (TxtApiPort != null && !string.IsNullOrEmpty(TxtApiPort.Text))
+            {
+                int currentPort;
+                if (int.TryParse(TxtApiPort.Text, out currentPort))
+                {
+                    // Only auto-suggest if using default ports
+                    if (currentPort == 8080 || currentPort == 8443)
+                    {
+                        if (RbHttp?.IsChecked == true)
+                        {
+                            TxtApiPort.Text = "8080";
+                        }
+                        else if (RbHttpsSelfSigned?.IsChecked == true || 
+                                 RbHttpsLetsEncrypt?.IsChecked == true || 
+                                 RbHttpsCustomCert?.IsChecked == true)
+                        {
+                            TxtApiPort.Text = "8443";
+                        }
+                    }
+                }
             }
         }
 
@@ -665,7 +696,7 @@ public partial class MainWindow : Window
             // Determine security mode
             bool enableHttps = RbHttpsSelfSigned.IsChecked == true || RbHttpsCustomCert.IsChecked == true || RbHttpsLetsEncrypt.IsChecked == true;
             string protocol = enableHttps ? "https" : "http";
-            int port = enableHttps ? 8443 : 8080;
+            int port = int.Parse(TxtApiPort.Text); // Use custom port from user input
             string certPath = "";
             string certPassword = "";
             
@@ -716,10 +747,8 @@ public partial class MainWindow : Window
             writer.WriteNumber("Port", int.Parse(TxtDbPort.Text));
             writer.WriteString("Database", TxtDbName.Text);
             writer.WriteString("Instance", "");
-            writer.WriteString("Username", TxtDbUser.Text);
+            writer.WriteString("UsernameEncrypted", ProtectString(TxtDbUser.Text));
             writer.WriteString("PasswordEncrypted", ProtectString(TxtDbPassword.Password));
-            writer.WriteBoolean("TrustServerCertificate", ChkTrustCertificate.IsChecked == true);
-            writer.WriteBoolean("Encrypted", true);
             writer.WriteNumber("CommandTimeoutSeconds", 60);
             writer.WriteEndObject();
             
@@ -793,8 +822,10 @@ public partial class MainWindow : Window
             if (string.IsNullOrEmpty(value))
                 return "";
             
+            // Use the same entropy as SecretsProtector for compatibility
+            var entropy = Encoding.UTF8.GetBytes("SqlSyncService.v1");
             var bytes = Encoding.UTF8.GetBytes(value);
-            var protectedBytes = ProtectedData.Protect(bytes, null, DataProtectionScope.LocalMachine);
+            var protectedBytes = ProtectedData.Protect(bytes, entropy, DataProtectionScope.LocalMachine);
             return Convert.ToBase64String(protectedBytes);
         }
 
@@ -1055,16 +1086,20 @@ public partial class MainWindow : Window
 
         private void ConfigureFirewall()
         {
-            // Remove existing rule
-            RunCommand("netsh", "advfirewall firewall delete rule name=\"SqlSyncService HTTPS\"");
+            int port = int.Parse(TxtApiPort.Text);
+            string ruleName = "SqlSyncService API";
             
-            // Add new rule
-            var result = RunCommand("netsh", "advfirewall firewall add rule name=\"SqlSyncService HTTPS\" dir=in action=allow protocol=TCP localport=8443");
+            // Remove existing rules (both old and new)
+            RunCommand("netsh", "advfirewall firewall delete rule name=\"SqlSyncService HTTPS\"");
+            RunCommand("netsh", $"advfirewall firewall delete rule name=\"{ruleName}\"");
+            
+            // Add new rule with custom port
+            var result = RunCommand("netsh", $"advfirewall firewall add rule name=\"{ruleName}\" dir=in action=allow protocol=TCP localport={port}");
             
             if (result.ExitCode == 0)
-                LogInstall("Firewall rule configured successfully");
+                LogInstall($"Firewall rule configured for port {port}");
             else
-                LogInstall("Warning: Failed to configure firewall rule");
+                LogInstall($"Warning: Failed to configure firewall rule for port {port}");
         }
 
         private void CreateShortcuts()

@@ -91,6 +91,38 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- API Port Section -->
+                        <Border Background="{StaticResource SurfaceBrush}" 
+                                CornerRadius="8" 
+                                Padding="20"
+                                Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="API Listen Port" 
+                                           FontSize="16" 
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,12"/>
+                                
+                                <TextBlock TextWrapping="Wrap"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           Margin="0,0,0,12">
+                                    Port for incoming API requests. Configure port forwarding on your router to this port.
+                                    <LineBreak/>
+                                    Requires service restart to take effect.
+                                </TextBlock>
+                                
+                                <Label Content="Port (1024-65535):"/>
+                                <TextBox x:Name="TxtApiPortAdmin" 
+                                         Width="150" 
+                                         HorizontalAlignment="Left"
+                                         Margin="0,0,0,12"/>
+                                
+                                <Button Content="💾 Update Port" 
+                                        Style="{StaticResource PrimaryButton}"
+                                        HorizontalAlignment="Left"
+                                        Click="UpdateApiPort_Click"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- IP Allow List Section -->
                         <Border Background="{StaticResource SurfaceBrush}" 
                                 CornerRadius="8" 
@@ -202,21 +234,32 @@
                                 <Label Content="Instance (optional):"/>
                                 <TextBox x:Name="DbInstanceTextBox" Margin="0,0,0,12"/>
 
+                                <Label Content="Username:"/>
+                                <TextBox x:Name="DbUsernameTextBox" Margin="0,0,0,12"/>
+
+                                <Label Content="Password:"/>
+                                <PasswordBox x:Name="DbPasswordBox" Margin="0,0,0,12"/>
+
                                 <Border Background="#fef3c7" 
                                         BorderBrush="#fcd34d"
                                         BorderThickness="1"
                                         CornerRadius="6"
                                         Padding="12"
                                         Margin="0,0,0,12">
-                                    <TextBlock Text="⚠️ Database credentials are stored encrypted using Windows DPAPI. Changes to credentials require service restart."
+                                    <TextBlock Text="⚠️ Database credentials are stored encrypted using Windows DPAPI. Leave password empty to keep existing password. Changes require service restart."
                                                Foreground="#92400e"
                                                TextWrapping="Wrap"/>
                                 </Border>
 
-                                <Button Content="🔌 Test Database Connection" 
-                                        Style="{StaticResource SuccessButton}"
-                                        HorizontalAlignment="Left"
-                                        Click="TestConnection_Click"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <Button Content="💾 Save Credentials" 
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,0"
+                                            Click="SaveCredentials_Click"/>
+                                    <Button Content="🔌 Test Connection" 
+                                            Style="{StaticResource SuccessButton}"
+                                            Click="TestConnection_Click"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -256,7 +299,7 @@
                               MouseDoubleClick="QueriesDataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="150"/>
-                            <DataGridCheckBoxColumn Header="Paginable" Binding="{Binding Paginable}" Width="80"/>
+                            <DataGridCheckBoxColumn Header="Paginable" Binding="{Binding Paginable, Mode=OneWay}" Width="80"/>
                             <DataGridTextColumn Header="Mode" Binding="{Binding PaginationMode}" Width="100"/>
                             <DataGridTextColumn Header="OrderBy/KeyColumns" Binding="{Binding OrderByOrKeys}" Width="*"/>
                             <DataGridTemplateColumn Header="Actions" Width="120">

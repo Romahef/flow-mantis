@@ -1,20 +1,20 @@
 {
   "Routes": [
     {
-      "Endpoint": "Warehouses",
+      "Endpoint": "LogisticSites",
       "Queries": [
         {
-          "QueryName": "Warehouses",
-          "TargetArray": "warehouses"
+          "QueryName": "LS",
+          "TargetArray": "logisticSites"
         }
       ]
     },
     {
-      "Endpoint": "StockOwners",
+      "Endpoint": "Depositors",
       "Queries": [
         {
-          "QueryName": "StockOwners",
-          "TargetArray": "stockOwners"
+          "QueryName": "DEPOSITOR",
+          "TargetArray": "depositors"
         }
       ]
     },
@@ -22,7 +22,7 @@
       "Endpoint": "Customers",
       "Queries": [
         {
-          "QueryName": "Customers",
+          "QueryName": "CUSTOMER",
           "TargetArray": "customers"
         }
       ]
@@ -31,25 +31,44 @@
       "Endpoint": "Items",
       "Queries": [
         {
-          "QueryName": "Items",
+          "QueryName": "ITEMS",
           "TargetArray": "items"
-        },
-        {
-          "QueryName": "StockItems",
-          "TargetArray": "stockItems"
         }
       ]
     },
     {
-      "Endpoint": "Inventory",
+      "Endpoint": "Stock",
       "Queries": [
         {
-          "QueryName": "Inventory",
-          "TargetArray": "stockDetail"
-        },
+          "QueryName": "ITEMS_STOCK",
+          "TargetArray": "itemsStock"
+        }
+      ]
+    },
+    {
+      "Endpoint": "DetailedStock",
+      "Queries": [
         {
-          "QueryName": "InventoryMovement",
-          "TargetArray": "inventoryMovements"
+          "QueryName": "DETAILED_STOCK",
+          "TargetArray": "detailedStock"
+        }
+      ]
+    },
+    {
+      "Endpoint": "Orders",
+      "Queries": [
+        {
+          "QueryName": "ORDER_STATUS",
+          "TargetArray": "orders"
+        }
+      ]
+    },
+    {
+      "Endpoint": "Receipts",
+      "Queries": [
+        {
+          "QueryName": "RECEIPT_STATUS",
+          "TargetArray": "receipts"
         }
       ]
     }

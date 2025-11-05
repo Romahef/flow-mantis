@@ -1,0 +1,461 @@
+{
+  "info": {
+    "name": "SqlSyncService API",
+    "description": "Complete API collection for SqlSyncService with all endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8088",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "YOUR_API_KEY_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. LogisticSites - Get All",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/LogisticSites",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "LogisticSites"]
+        },
+        "description": "Get all logistic sites (not paginable)"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Depositors - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Depositors",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Depositors"]
+        },
+        "description": "Get first page of depositors (paginable with Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Depositors - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Depositors?offset=0&limit=50",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Depositors"],
+          "query": [
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Starting row (0 = first page)"
+            },
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of rows per page"
+            }
+          ]
+        },
+        "description": "Get depositors with pagination (Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Customers - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Customers"]
+        },
+        "description": "Get first page of customers (paginable with Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Customers - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Customers?offset=0&limit=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Customers"],
+          "query": [
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Starting row"
+            },
+            {
+              "key": "limit",
+              "value": "100",
+              "description": "Rows per page"
+            }
+          ]
+        },
+        "description": "Get customers with pagination"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Items - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Items"]
+        },
+        "description": "Get first page of items/products (paginable with Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Items - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Items?offset=0&limit=200",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Items"],
+          "query": [
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Starting row"
+            },
+            {
+              "key": "limit",
+              "value": "200",
+              "description": "Rows per page"
+            }
+          ]
+        },
+        "description": "Get items with pagination"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Stock - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Stock",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Stock"]
+        },
+        "description": "Get first page of stock items (paginable with Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Stock - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Stock?offset=0&limit=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Stock"],
+          "query": [
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Starting row"
+            },
+            {
+              "key": "limit",
+              "value": "100",
+              "description": "Rows per page"
+            }
+          ]
+        },
+        "description": "Get stock with pagination"
+      },
+      "response": []
+    },
+    {
+      "name": "6. DetailedStock - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/DetailedStock",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "DetailedStock"]
+        },
+        "description": "Get first page of detailed stock (paginable with Offset mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "6. DetailedStock - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/DetailedStock?offset=0&limit=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "DetailedStock"],
+          "query": [
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Starting row"
+            },
+            {
+              "key": "limit",
+              "value": "100",
+              "description": "Rows per page"
+            }
+          ]
+        },
+        "description": "Get detailed stock with pagination"
+      },
+      "response": []
+    },
+    {
+      "name": "7. Orders - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Orders"]
+        },
+        "description": "Get first page of orders (paginable with Token mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "7. Orders - With Token Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Orders?limit=50",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Orders"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of rows per page"
+            }
+          ]
+        },
+        "description": "Get orders with token pagination (first page). Response will include 'nextToken' for next page."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Orders - Next Page (Token)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Orders?limit=50&token=NEXT_TOKEN_FROM_PREVIOUS_RESPONSE",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Orders"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of rows per page"
+            },
+            {
+              "key": "token",
+              "value": "NEXT_TOKEN_FROM_PREVIOUS_RESPONSE",
+              "description": "Token from previous response's 'nextToken' field"
+            }
+          ]
+        },
+        "description": "Get next page of orders using token from previous response"
+      },
+      "response": []
+    },
+    {
+      "name": "8. Receipts - Get All (First Page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Receipts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Receipts"]
+        },
+        "description": "Get first page of receipts (paginable with Token mode)"
+      },
+      "response": []
+    },
+    {
+      "name": "8. Receipts - With Token Pagination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Receipts?limit=50",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Receipts"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of rows per page"
+            }
+          ]
+        },
+        "description": "Get receipts with token pagination (first page). Response will include 'nextToken' for next page."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Receipts - Next Page (Token)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/Receipts?limit=50&token=NEXT_TOKEN_FROM_PREVIOUS_RESPONSE",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Receipts"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of rows per page"
+            },
+            {
+              "key": "token",
+              "value": "NEXT_TOKEN_FROM_PREVIOUS_RESPONSE",
+              "description": "Token from previous response's 'nextToken' field"
+            }
+          ]
+        },
+        "description": "Get next page of receipts using token from previous response"
+      },
+      "response": []
+    }
+  ]
+}
+
+
