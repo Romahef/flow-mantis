@@ -73,8 +73,8 @@ sqlcmd -S localhost,1433 -U sa -P 'YourStrong@Passw0rd'
 
 ```bash
 # Connect and create database
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P 'YourStrong@Passw0rd' \
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P 'YourStrong@Passw0rd' -C \
   -Q "CREATE DATABASE WMS_Database;"
 ```
 
@@ -235,13 +235,13 @@ docker logs sqlserver
 ### Execute SQL scripts
 ```bash
 # From a file
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P 'YourStrong@Passw0rd' \
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P 'YourStrong@Passw0rd' -C \
   -i /path/to/script.sql
 
 # Interactive mode
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P 'YourStrong@Passw0rd'
+docker exec -it sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P 'YourStrong@Passw0rd' -C
 ```
 
 ## Connection String for SqlSyncService

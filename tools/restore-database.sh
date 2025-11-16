@@ -56,7 +56,7 @@ echo ""
 # Get logical file names from backup
 echo "🔍 Analyzing backup file..."
 echo ""
-FILELISTONLY=$(docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/$BACKUP_FILENAME'" -h -1 -W -s"|")
+FILELISTONLY=$(docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/$BACKUP_FILENAME'" -h -1 -W -s"|")
 
 # Extract first logical names (typically the database files)
 LOGICAL_DATA_NAME=$(echo "$FILELISTONLY" | head -1 | awk -F'|' '{print $1}' | xargs)
@@ -79,7 +79,7 @@ echo "📂 Database name: $DB_NAME"
 echo ""
 
 # Check if database already exists
-EXISTING=$(docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "SELECT name FROM sys.databases WHERE name = '$DB_NAME'" -h -1 | xargs)
+EXISTING=$(docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "SELECT name FROM sys.databases WHERE name = '$DB_NAME'" -h -1 | xargs)
 
 if [ ! -z "$EXISTING" ]; then
     echo "⚠️  Database '$DB_NAME' already exists!"
@@ -93,7 +93,7 @@ if [ ! -z "$EXISTING" ]; then
     
     echo ""
     echo "🗑️  Dropping existing database..."
-    docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "ALTER DATABASE [$DB_NAME] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$DB_NAME]"
+    docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "ALTER DATABASE [$DB_NAME] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$DB_NAME]"
     echo "✓ Existing database removed"
     echo ""
 fi
@@ -104,7 +104,7 @@ echo ""
 
 RESTORE_SQL="RESTORE DATABASE [$DB_NAME] FROM DISK='/var/opt/mssql/data/$BACKUP_FILENAME' WITH MOVE '$LOGICAL_DATA_NAME' TO '/var/opt/mssql/data/${DB_NAME}.mdf', MOVE '$LOGICAL_LOG_NAME' TO '/var/opt/mssql/data/${DB_NAME}_log.ldf', REPLACE"
 
-if docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "$RESTORE_SQL"; then
+if docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "$RESTORE_SQL"; then
     echo ""
     echo "================================================="
     echo "✅ Database restored successfully!"
@@ -127,7 +127,7 @@ else
     echo "Troubleshooting:"
     echo "1. Check backup file is valid"
     echo "2. Try viewing backup contents:"
-    echo "   docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q \"RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/$BACKUP_FILENAME'\""
+    echo "   docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q \"RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/$BACKUP_FILENAME'\""
     echo ""
     echo "3. Check SQL Server logs:"
     echo "   docker logs sqlserver"

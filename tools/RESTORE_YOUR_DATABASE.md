@@ -69,7 +69,7 @@ docker cp /path/to/your-backup.bak sqlserver:/var/opt/mssql/data/
 **2. Check what's inside the backup:**
 
 ```bash
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/your-backup.bak'"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/your-backup.bak'"
 ```
 
 This shows the logical file names (you'll need them for the next step).
@@ -78,16 +78,16 @@ This shows the logical file names (you'll need them for the next step).
 
 ```bash
 # Basic restore (if logical names match)
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak' WITH REPLACE"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak' WITH REPLACE"
 
 # Or with explicit file names (if needed)
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak' WITH MOVE 'LogicalDataName' TO '/var/opt/mssql/data/YourDB.mdf', MOVE 'LogicalLogName' TO '/var/opt/mssql/data/YourDB_log.ldf', REPLACE"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak' WITH MOVE 'LogicalDataName' TO '/var/opt/mssql/data/YourDB.mdf', MOVE 'LogicalLogName' TO '/var/opt/mssql/data/YourDB_log.ldf', REPLACE"
 ```
 
 **4. Verify the restore:**
 
 ```bash
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "SELECT name FROM sys.databases"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "SELECT name FROM sys.databases"
 ```
 
 ---
@@ -120,13 +120,13 @@ cd /Users/roman/Sites/mantis-flow/flow-mantis/tools
 docker cp /Users/roman/Downloads/MantisDB.bak sqlserver:/var/opt/mssql/data/
 
 # 3. Check backup contents
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/MantisDB.bak'"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE FILELISTONLY FROM DISK='/var/opt/mssql/data/MantisDB.bak'"
 
 # 4. Restore database
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE DATABASE MantisDB FROM DISK='/var/opt/mssql/data/MantisDB.bak' WITH REPLACE"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE DATABASE MantisDB FROM DISK='/var/opt/mssql/data/MantisDB.bak' WITH REPLACE"
 
 # 5. Verify
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "SELECT name FROM sys.databases"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "SELECT name FROM sys.databases"
 
 # 6. Generate JSON examples
 cd JsonExampleGenerator
@@ -160,10 +160,10 @@ docker restart sqlserver
 
 ```bash
 # Check backup file is in container
-docker exec -it sqlserver ls -la /var/opt/mssql/data/
+docker exec sqlserver ls -la /var/opt/mssql/data/
 
 # Try simple restore first
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE DATABASE TestDB FROM DISK='/var/opt/mssql/data/your-backup.bak'"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE DATABASE TestDB FROM DISK='/var/opt/mssql/data/your-backup.bak'"
 ```
 
 ### "Database name conflicts"
@@ -172,10 +172,10 @@ If a database with the same name already exists:
 
 ```bash
 # Drop existing database first
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "DROP DATABASE YourDBName"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "DROP DATABASE YourDBName"
 
 # Then restore
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak'"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "RESTORE DATABASE YourDBName FROM DISK='/var/opt/mssql/data/your-backup.bak'"
 ```
 
 ---
@@ -207,13 +207,13 @@ docker restart sqlserver
 docker logs sqlserver
 
 # Interactive SQL prompt
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd'
+docker exec -it sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C
 
 # Execute SQL file
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -i /path/to/script.sql
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -i /path/to/script.sql
 
 # Backup database
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "BACKUP DATABASE YourDB TO DISK='/var/opt/mssql/data/YourDB-backup.bak'"
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "BACKUP DATABASE YourDB TO DISK='/var/opt/mssql/data/YourDB-backup.bak'"
 
 # Copy backup out of container
 docker cp sqlserver:/var/opt/mssql/data/YourDB-backup.bak /Users/roman/Downloads/

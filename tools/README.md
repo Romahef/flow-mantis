@@ -78,8 +78,8 @@ docker run -e "ACCEPT_EULA=Y" \
   -d mcr.microsoft.com/mssql/server:2022-latest
 
 # 2. Create test database
-docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P 'YourStrong@Passw0rd' \
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P 'YourStrong@Passw0rd' -C \
   -Q "CREATE DATABASE WMS_Database;"
 
 # 3. Load sample data (see SQL-Server-Docker-Setup.md)
@@ -187,7 +187,7 @@ Each file contains:
 ### "Connection failed"
 
 - Check SQL Server is running: `docker ps`
-- Test connection: `docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "SELECT @@VERSION"`
+- Test connection: `docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -C -Q "SELECT @@VERSION"`
 - Verify password and connection string
 
 ### "No data returned"
