@@ -1,0 +1,97 @@
+{
+  "queryName": "ITEMS",
+  "rowCount": 10,
+  "maxRowsLimit": 10,
+  "data": [
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 24,
+      "prd_PrimaryCode": "AC",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E4\u05E8\u05D9\u05D8 \u05D0\u05D5\u05DC\u05E7\u05E8\u05D2\u05D5",
+      "prdl_ShortDescription": "\u05E4\u05E8\u05D9\u05D8 \u05D0\u05D5\u05DC\u05E7\u05E8\u05D2\u05D5"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 29,
+      "prd_PrimaryCode": "19971999899",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E7\u05D0\u05E8\u05E3 \u05DE\u05D9\u05DD SIVAN 800 \u05DE\u0022\u05DC\r\n",
+      "prdl_ShortDescription": "\u05E7\u05D0\u05E8\u05E3 \u05DE\u05D9\u05DD SIVAN 800 \u05DE\u0022\u05DC\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 30,
+      "prd_PrimaryCode": "19972999899",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05DB\u05D5\u05E1 \u05D6\u05DB\u05D5\u05DB\u05D9\u05EA SIVAN 300 \u05DE\u0022\u05DC\r\n",
+      "prdl_ShortDescription": "\u05DB\u05D5\u05E1 \u05D6\u05DB\u05D5\u05DB\u05D9\u05EA SIVAN 300 \u05DE\u0022\u05DC\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 40,
+      "prd_PrimaryCode": "12704990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E1\u05DB\u05D5\u05DD 24 ASTORIA\r\n",
+      "prdl_ShortDescription": "\u05E1\u05DB\u05D5\u05DD 24 ASTORIA\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 41,
+      "prd_PrimaryCode": "12705990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E1\u05DB\u05D5\u05DD 24 WILD\r\n",
+      "prdl_ShortDescription": "\u05E1\u05DB\u05D5\u05DD 24 WILD\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 42,
+      "prd_PrimaryCode": "15688990199",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05DE\u05D6\u05DC\u05D2-\u05DB\u05E4\u05D9\u05EA \u05DE\u05D5\u05D6\u05D4\u05D1 18\\10 1.5 \u05DE\u0022\u05DE\r\n",
+      "prdl_ShortDescription": "\u05DE\u05D6\u05DC\u05D2-\u05DB\u05E4\u05D9\u05EA \u05DE\u05D5\u05D6\u05D4\u05D1 18\\10 1.5 \u05DE\u0022\u05DE\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 43,
+      "prd_PrimaryCode": "22745990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05DE\u05D6\u05DC\u05D2 \u05DB\u05E4\u05D9\u05EA\r\n",
+      "prdl_ShortDescription": "\u05DE\u05D6\u05DC\u05D2 \u05DB\u05E4\u05D9\u05EA\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 45,
+      "prd_PrimaryCode": "23675990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E1\u05D8 6 \u05E1\u05DB\u05D9\u05E0\u05D9\u05DD DINER\r\n",
+      "prdl_ShortDescription": "\u05E1\u05D8 6 \u05E1\u05DB\u05D9\u05E0\u05D9\u05DD DINER\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 46,
+      "prd_PrimaryCode": "23676990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E1\u05D8 6 \u05DE\u05D6\u05DC\u05D2\u05D5\u05EA DINER\r\n",
+      "prdl_ShortDescription": "\u05E1\u05D8 6 \u05DE\u05D6\u05DC\u05D2\u05D5\u05EA DINER\r\n"
+    },
+    {
+      "dep_ID": 1,
+      "dep_code": "AC",
+      "prd_ID": 47,
+      "prd_PrimaryCode": "23677990099",
+      "prd_SecondaryCode": null,
+      "prdl_Description": "\u05E1\u05D8 6 \u05DB\u05E4\u05D5\u05EA DINER\r\n",
+      "prdl_ShortDescription": "\u05E1\u05D8 6 \u05DB\u05E4\u05D5\u05EA DINER\r\n"
+    }
+  ]
+}

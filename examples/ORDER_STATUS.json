@@ -1,0 +1,127 @@
+{
+  "queryName": "ORDER_STATUS",
+  "rowCount": 10,
+  "maxRowsLimit": 10,
+  "data": [
+    {
+      "dep_ID": 1,
+      "dep_Code": "AC",
+      "ord_Code": "SO25000022",
+      "ord_StatusID": 1,
+      "msg_Greek": "\u05DE\u05DE\u05EA\u05D9\u05DF",
+      "ord_InputDate": "2025-05-13T00:00:00.0000000",
+      "orc_Code": "100002",
+      "orc_FullName": "orc_FullName14314",
+      "orc_Address": "\u05D1\u05DF \u05D9\u05D4\u05D5\u05D3\u05D4",
+      "orc_City": "\u05E0\u05EA\u05E0\u05D9\u05D4"
+    },
+    {
+      "dep_ID": 4,
+      "dep_Code": "CL",
+      "ord_Code": "OR10083",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-19T15:04:25.0000000",
+      "orc_Code": "C_CL",
+      "orc_FullName": "orc_FullName14861",
+      "orc_Address": "\u05D8\u05E1\u05D8",
+      "orc_City": null
+    },
+    {
+      "dep_ID": 4,
+      "dep_Code": "CL",
+      "ord_Code": "ORD002693",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-19T15:09:05.0000000",
+      "orc_Code": "C_CL",
+      "orc_FullName": "orc_FullName14862",
+      "orc_Address": "\u05D8\u05E1\u05D8",
+      "orc_City": null
+    },
+    {
+      "dep_ID": 38,
+      "dep_Code": "ANIX",
+      "ord_Code": "11947",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-12T19:06:00.0000000",
+      "orc_Code": "211894",
+      "orc_FullName": "orc_FullName14298",
+      "orc_Address": "??",
+      "orc_City": "??"
+    },
+    {
+      "dep_ID": 38,
+      "dep_Code": "ANIX",
+      "ord_Code": "11958",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-15T12:32:00.0000000",
+      "orc_Code": "2531000012",
+      "orc_FullName": "orc_FullName14597",
+      "orc_Address": "\u05D1\u05D5\u05E8\u05DC\u05D0 48",
+      "orc_City": "\u05EA\u05DC \u05D0\u05D1\u05D9\u05D1-\u05D9\u05E4\u05D5"
+    },
+    {
+      "dep_ID": 38,
+      "dep_Code": "ANIX",
+      "ord_Code": "11961",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-18T14:58:00.0000000",
+      "orc_Code": "450069278",
+      "orc_FullName": "orc_FullName14734",
+      "orc_Address": "\u05D4\u05E7\u05D3\u05DE\u05D4 26",
+      "orc_City": "\u05D9\u05E7\u05E0\u05E2\u05DD"
+    },
+    {
+      "dep_ID": 38,
+      "dep_Code": "ANIX",
+      "ord_Code": "11962",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-18T14:58:00.0000000",
+      "orc_Code": "450042005",
+      "orc_FullName": "orc_FullName14735",
+      "orc_Address": "\u05D4\u05E7\u05D3\u05DE\u05D4 26",
+      "orc_City": "\u05D9\u05E7\u05E0\u05E2\u05DD"
+    },
+    {
+      "dep_ID": 38,
+      "dep_Code": "ANIX",
+      "ord_Code": "11963",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-18T14:58:00.0000000",
+      "orc_Code": "450070978",
+      "orc_FullName": "orc_FullName14736",
+      "orc_Address": "\u05D4\u05E7\u05D3\u05DE\u05D4 26",
+      "orc_City": "\u05D9\u05E7\u05E0\u05E2\u05DD"
+    },
+    {
+      "dep_ID": 49,
+      "dep_Code": "SE",
+      "ord_Code": "OR10079",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-19T13:52:29.0000000",
+      "orc_Code": "C_SE",
+      "orc_FullName": "orc_FullName14851",
+      "orc_Address": null,
+      "orc_City": null
+    },
+    {
+      "dep_ID": 57,
+      "dep_Code": "Joe",
+      "ord_Code": "OR10098",
+      "ord_StatusID": 2,
+      "msg_Greek": "\u05D1\u05D9\u05E6\u05D5\u05E2",
+      "ord_InputDate": "2025-05-20T16:45:26.0000000",
+      "orc_Code": "2386093",
+      "orc_FullName": "orc_FullName14996",
+      "orc_Address": null,
+      "orc_City": null
+    }
+  ]
+}

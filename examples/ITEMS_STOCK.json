@@ -1,0 +1,43 @@
+{
+  "queryName": "ITEMS_STOCK",
+  "rowCount": 2,
+  "maxRowsLimit": 10,
+  "data": [
+    {
+      "dep_ID": 1,
+      "dep_Code": "AC",
+      "prd_ID": 24,
+      "prd_PrimaryCode": "AC",
+      "prd_SecondaryCode": null,
+      "prdl_ShortDescription": "\u05E4\u05E8\u05D9\u05D8 \u05D0\u05D5\u05DC\u05E7\u05E8\u05D2\u05D5",
+      "PC_QTY": 436.000000,
+      "PC_QTYFree": 436.000000,
+      "CRT_QTY": 436.000000,
+      "CRT_QTYFree": 436.000000,
+      "PendReceiptQty": 20.000000,
+      "PendOrderQty": 10.000000,
+      "los_ID": 2,
+      "los_Code": "01",
+      "los_Description": "\u05DE\u05E8\u05DC\u05D5\u05D2 \u05D2\u05D3\u05D5\u05DC",
+      "pls_SafetyStock": 0.000000
+    },
+    {
+      "dep_ID": 1,
+      "dep_Code": "AC",
+      "prd_ID": 24,
+      "prd_PrimaryCode": "AC",
+      "prd_SecondaryCode": null,
+      "prdl_ShortDescription": "\u05E4\u05E8\u05D9\u05D8 \u05D0\u05D5\u05DC\u05E7\u05E8\u05D2\u05D5",
+      "PC_QTY": 25.000000,
+      "PC_QTYFree": 25.000000,
+      "CRT_QTY": 25.000000,
+      "CRT_QTYFree": 25.000000,
+      "PendReceiptQty": 430.000000,
+      "PendOrderQty": null,
+      "los_ID": 4,
+      "los_Code": "02",
+      "los_Description": "\u05DE\u05E8\u05DC\u05D5\u05D2 \u05E7\u05D8\u05DF",
+      "pls_SafetyStock": 0.000000
+    }
+  ]
+}

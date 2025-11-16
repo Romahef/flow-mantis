@@ -1,0 +1,17 @@
+{
+  "queryName": "LS",
+  "rowCount": 2,
+  "maxRowsLimit": 10,
+  "data": [
+    {
+      "los_ID": 2,
+      "los_Code": "01",
+      "los_Description": "\u05DE\u05E8\u05DC\u05D5\u05D2 \u05D2\u05D3\u05D5\u05DC"
+    },
+    {
+      "los_ID": 4,
+      "los_Code": "02",
+      "los_Description": "\u05DE\u05E8\u05DC\u05D5\u05D2 \u05E7\u05D8\u05DF"
+    }
+  ]
+}
