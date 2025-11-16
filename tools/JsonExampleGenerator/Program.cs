@@ -18,7 +18,7 @@ class Program
         var connectionString = GetArgument(args, "--connection", "");
         var queriesPath = GetArgument(args, "--queries", "../../config-samples/queries.json");
         var outputDir = GetArgument(args, "--output", "./examples");
-        var maxRows = int.Parse(GetArgument(args, "--max-rows", "10"));
+        var maxRows = int.Parse(GetArgument(args, "--max-rows", "0")); // 0 = unlimited
 
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -28,7 +28,7 @@ class Program
             Console.WriteLine("  --connection    SQL Server connection string (required)");
             Console.WriteLine("  --queries       Path to queries.json (default: ../../config-samples/queries.json)");
             Console.WriteLine("  --output        Output directory for JSON files (default: ./examples)");
-            Console.WriteLine("  --max-rows      Maximum rows per query (default: 10)\n");
+            Console.WriteLine("  --max-rows      Maximum rows per query (default: 0 = unlimited, use 10 for sample)\n");
             Console.WriteLine("Examples:");
             Console.WriteLine("  # Connect to SQL Server");
             Console.WriteLine("  dotnet run -- --connection \"Server=localhost;Database=WMS;User Id=sa;Password=YourPass;TrustServerCertificate=True\"\n");
@@ -102,7 +102,7 @@ class Program
                         { 
                             queryName = query.Name,
                             rowCount = results.Count,
-                            maxRowsLimit = maxRows,
+                            maxRowsLimit = maxRows == 0 ? "unlimited" : maxRows.ToString(),
                             data = results
                         };
                         var json = JsonSerializer.Serialize(output, new JsonSerializerOptions { WriteIndented = true });
@@ -209,7 +209,7 @@ class Program
         using var reader = await command.ExecuteReaderAsync();
         
         int rowCount = 0;
-        while (await reader.ReadAsync() && rowCount < maxRows)
+        while (await reader.ReadAsync() && (maxRows == 0 || rowCount < maxRows))
         {
             var row = new Dictionary<string, object?>();
             
